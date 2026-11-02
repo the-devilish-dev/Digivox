@@ -1,0 +1,6 @@
+*.pid
+*.log
+proxy_test.log.txt
+proxy_verify.log.txt
+node_modules/
+.DS_Store
