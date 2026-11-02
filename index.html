@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DigiVox — Voice Studio</title>
+    <style>
+        :root {
+            --bg-deep:   #030508;
+            --neon:      #00ffe7;
+            --purple:    #a78bfa;
+            --pink:      #ff2d78;
+            --amber:     #f59e0b;
+            --green:     #22c55e;
+            --blue:      #38bdf8;
+            --text:      #e8f4f8;
+            --muted:     #4a6070;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: var(--bg-deep);
+            min-height: 100vh;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* ── Canvas background ── */
+        #bg-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+        }
+
+        .container {
+            max-width: 480px; margin: 0 auto;
+            padding: 0 16px 40px;
+            position: relative; z-index: 10;
+        }
+
+        /* ── Header ── */
+        header {
+            text-align: center;
+            padding: 52px 0 32px;
+        }
+
+        .lab-logo {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 72px; height: 72px; border-radius: 22px;
+            background: linear-gradient(135deg, #1a0a2e, #0d1a2e);
+            border: 1px solid rgba(167,139,250,0.3);
+            box-shadow: 0 0 40px rgba(167,139,250,0.25), 0 0 80px rgba(255,45,120,0.1), inset 0 1px 0 rgba(255,255,255,0.06);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            animation: logoFloat 4s ease-in-out infinite;
+        }
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); box-shadow: 0 0 40px rgba(167,139,250,0.25), 0 0 80px rgba(255,45,120,0.1), inset 0 1px 0 rgba(255,255,255,0.06); }
+            50% { transform: translateY(-6px); box-shadow: 0 12px 60px rgba(167,139,250,0.35), 0 0 100px rgba(255,45,120,0.15), inset 0 1px 0 rgba(255,255,255,0.06); }
+        }
+
+        .brand-name {
+            font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;
+            background: linear-gradient(90deg, var(--purple) 0%, var(--pink) 50%, var(--neon) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            line-height: 1;
+        }
+        .brand-sub {
+            font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase;
+            color: var(--muted); margin-top: 6px; font-weight: 500;
+        }
+
+        .suite-badge {
+            display: inline-block; margin-top: 14px;
+            background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2);
+            border-radius: 20px; padding: 5px 16px;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+            color: var(--purple);
+        }
+
+        /* ── Gem Grid ── */
+        .gem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 8px;
+        }
+
+        .gem-card {
+            position: relative; overflow: hidden;
+            border-radius: 22px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(10,12,20,0.7);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+            text-decoration: none; color: inherit;
+            display: block;
+            aspect-ratio: 1 / 1.1;
+            padding: 22px 18px 18px;
+        }
+
+        .gem-card:hover {
+            transform: translateY(-6px) scale(1.02);
+        }
+
+        .gem-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            border-radius: 22px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+        .gem-card:hover::before { opacity: 1; }
+
+        .gem-digivoice {
+            --gem-color: #00ffe7;
+            --gem-glow: rgba(0,255,231,0.25);
+        }
+        .gem-digivoice::before { background: radial-gradient(ellipse at 50% 0%, rgba(0,255,231,0.08) 0%, transparent 70%); }
+        .gem-digivoice:hover { box-shadow: 0 20px 60px rgba(0,255,231,0.2), 0 0 0 1px rgba(0,255,231,0.2); }
+
+        .gem-podcast {
+            --gem-color: #a78bfa;
+            --gem-glow: rgba(167,139,250,0.25);
+        }
+        .gem-podcast::before { background: radial-gradient(ellipse at 50% 0%, rgba(167,139,250,0.1) 0%, transparent 70%); }
+        .gem-podcast:hover { box-shadow: 0 20px 60px rgba(167,139,250,0.2), 0 0 0 1px rgba(167,139,250,0.2); }
+
+        .gem-scripted {
+            --gem-color: #ff2d78;
+            --gem-glow: rgba(255,45,120,0.25);
+        }
+        .gem-scripted::before { background: radial-gradient(ellipse at 50% 0%, rgba(255,45,120,0.08) 0%, transparent 70%); }
+        .gem-scripted:hover { box-shadow: 0 20px 60px rgba(255,45,120,0.2), 0 0 0 1px rgba(255,45,120,0.2); }
+
+        .gem-yapper {
+            --gem-color: #f59e0b;
+            --gem-glow: rgba(245,158,11,0.25);
+        }
+        .gem-yapper::before { background: radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.08) 0%, transparent 70%); }
+        .gem-yapper:hover { box-shadow: 0 20px 60px rgba(245,158,11,0.2), 0 0 0 1px rgba(245,158,11,0.2); }
+
+        .gem-card::after {
+            content: '';
+            position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gem-color, #fff), transparent);
+            opacity: 0.5;
+        }
+
+        .gem-icon-wrap {
+            width: 52px; height: 52px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; margin-bottom: 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        .gem-card:hover .gem-icon-wrap { transform: scale(1.1) rotate(-3deg); }
+
+        .gem-icon-glow {
+            position: absolute; inset: -4px; border-radius: 20px;
+            background: radial-gradient(circle, var(--gem-glow, rgba(255,255,255,0.1)) 0%, transparent 70%);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .gem-card:hover .gem-icon-glow { opacity: 1; }
+
+        .gem-number {
+            position: absolute; top: 14px; right: 14px;
+            font-size: 0.6rem; font-weight: 800; letter-spacing: 1px;
+            color: var(--gem-color, var(--muted)); opacity: 0.5;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .gem-title {
+            font-size: 1rem; font-weight: 800; letter-spacing: -0.3px;
+            color: var(--text); margin-bottom: 5px; line-height: 1.2;
+        }
+
+        .gem-desc {
+            font-size: 0.72rem; color: var(--muted); line-height: 1.5; font-weight: 400;
+        }
+
+        .gem-tag {
+            display: inline-block; margin-top: 10px;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 0.62rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            color: var(--gem-color, var(--muted));
+        }
+
+        /* ── Waveform animation on hover ── */
+        .gem-waveform {
+            position: absolute; bottom: 14px; right: 14px;
+            display: flex; align-items: flex-end; gap: 2px; height: 18px;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .gem-card:hover .gem-waveform { opacity: 0.6; }
+        .wv-bar {
+            width: 3px; border-radius: 2px;
+            background: var(--gem-color, #fff);
+            animation: wvAnim 0.8s ease-in-out infinite;
+        }
+        .wv-bar:nth-child(1) { height: 6px;  animation-delay: 0s; }
+        .wv-bar:nth-child(2) { height: 12px; animation-delay: 0.1s; }
+        .wv-bar:nth-child(3) { height: 8px;  animation-delay: 0.2s; }
+        .wv-bar:nth-child(4) { height: 14px; animation-delay: 0.05s; }
+        .wv-bar:nth-child(5) { height: 6px;  animation-delay: 0.15s; }
+        @keyframes wvAnim {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.8); }
+        }
+
+        /* ── Settings Panel ── */
+        .settings-section {
+            margin-top: 32px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .settings-toggle {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; cursor: pointer; transition: background 0.2s;
+            user-select: none;
+        }
+        .settings-toggle:hover { background: rgba(255,255,255,0.05); }
+        .settings-toggle-left { display: flex; align-items: center; gap: 10px; }
+        .settings-toggle-icon { font-size: 1.1rem; }
+        .settings-toggle-text { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+        .settings-toggle-sub { font-size: 0.7rem; color: var(--muted); margin-top: 1px; }
+        .settings-toggle-arrow { color: var(--muted); transition: transform 0.3s; font-size: 0.8rem; }
+        .settings-toggle-arrow.open { transform: rotate(180deg); }
+
+        .settings-panel {
+            display: none;
+            background: rgba(8,10,18,0.9); border: 1px solid rgba(255,255,255,0.06);
+            border-top: none; border-radius: 0 0 14px 14px;
+            padding: 18px;
+        }
+        .settings-panel.open { display: block; }
+
+        .form-group { margin-bottom: 14px; }
+        label {
+            display: block; margin-bottom: 6px;
+            font-size: 0.72rem; font-weight: 600; color: var(--muted);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%; padding: 11px 14px;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; color: var(--text); font-size: 0.88rem;
+            transition: border-color 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--purple); }
+
+        .btn-save {
+            width: 100%; padding: 13px; border: none; border-radius: 10px;
+            background: linear-gradient(90deg, var(--purple), var(--pink));
+            color: #fff; font-size: 0.88rem; font-weight: 700;
+            cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+        }
+        .btn-save:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(124,58,237,0.45); }
+
+        .key-status {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.72rem; margin-top: 10px; padding: 8px 12px;
+            border-radius: 8px;
+        }
+        .key-status.ok { background: rgba(34,197,94,0.08); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
+        .key-status.missing { background: rgba(251,191,36,0.08); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center; padding: 32px 0 16px;
+            color: var(--muted); font-size: 0.68rem; letter-spacing: 0.5px;
+        }
+        footer span { color: var(--pink); }
+
+        /* ── Notification toast ── */
+        .toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+            background: rgba(10,14,24,0.95); border: 1px solid rgba(167,139,250,0.3);
+            border-radius: 12px; padding: 12px 20px;
+            font-size: 0.82rem; font-weight: 600; color: var(--text);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            z-index: 999; white-space: nowrap;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (min-width: 600px) {
+            .brand-name { font-size: 2.8rem; }
+            .gem-grid { gap: 18px; }
+        }
+    
+        /* ── Scroll hint ── */
+        .scroll-hint {
+            position: fixed;
+            left: 50%;
+            bottom: 90px;
+            transform: translateX(-50%);
+            z-index: 10000;
+            text-align: center;
+            padding: 12px 26px;
+            width: max-content;
+            max-width: 90%;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+            background: rgba(10, 14, 26, 0.92);
+            border: 1px solid rgba(6, 182, 212, 0.65);
+            border-radius: 999px;
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+            opacity: 1;
+            animation: bounceHint 1.6s infinite;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .scroll-hint.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(18px);
+            animation: none;
+        }
+        @keyframes bounceHint {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="container">
+    <header>
+        <div class="lab-logo">🔊</div>
+        <div class="brand-name">DigiVox</div>
+        <div class="suite-badge">✦ Audio Suite</div>
+        <div class="brand-sub">from Devilish Labs</div>
+    </header>
+
+    <!-- ── Scroll hint ── -->
+    <div id="scroll-hint" class="scroll-hint">
+        Swipe down to explore 👇
+    </div>
+
+    <!-- ── Gem Grid ── -->
+    <div class="gem-grid">
+
+        <!-- Gem 1: DigiVoice -->
+        <a class="gem-card gem-digivoice" href="DigiVoice.html">
+            <span class="gem-number">01</span>
+            <div class="gem-icon-wrap">
+                🎙
+                <div class="gem-icon-glow"></div>
+            </div>
+            <div class="gem-title">DigiVoice</div>
+            <div class="gem-desc">TTS studio. Clone voices, synth speech, browse the library.</div>
+            <div class="gem-tag">Voice Synthesis</div>
+            <div class="gem-waveform">
+                <div class="wv-bar"></div><div class="wv-bar"></div>
+                <div class="wv-bar"></div><div class="wv-bar"></div>
+                <div class="wv-bar"></div>
+            </div>
+        </a>
+
+        <!-- Gem 2: PodGen -->
+        <a class="gem-card gem-podcast" href="PodcastGen.html">
+            <span class="gem-number">02</span>
+            <div class="gem-icon-wrap">
+                🎙
+                <div class="gem-icon-glow"></div>
+            </div>
+            <div class="gem-title">PodGen</div>
+            <div class="gem-desc">AI-written scripts. Two-host or solo. Real audio output.</div>
+            <div class="gem-tag">AI Podcast</div>
+            <div class="gem-waveform">
+                <div class="wv-bar"></div><div class="wv-bar"></div>
+                <div class="wv-bar"></div><div class="wv-bar"></div>
+                <div class="wv-bar"></div>
+            </div>
+        </a>
+
+        <!-- Gem 3: Scripted Performance -->
+        <a class="gem-card gem-scripted" href="ScriptedPerformance.html">
+            <span class="gem-number">03</span>
+            <div class="gem-icon-wrap">
+                🎭
+                <div class="gem-icon-glow"></div>
+            </div>
+            <div class="gem-title">SCRIPT'D</div>
+            <div class="gem-desc">Multi-role reader. Voice bindings. BGM. Audiobooks & RP.</div>
+            <div class="gem-tag">Performance</div>
+            <div class="gem-waveform">
+                <div class="wv-bar"></div><div class="wv-bar"></div>
+                <div class="wv-bar"></div><div class="wv-bar"></div>
+                <div class="wv-bar"></div>
+            </div>
+        </a>
+
+        <!-- Gem 4: Yapper (Live Convo) -->
+        <a class="gem-card gem-yapper" href="Yapper.html">
+            <span class="gem-number">04</span>
+            <div class="gem-icon-wrap">
+                💬
+                <div class="gem-icon-glow"></div>
+            </div>
+            <div class="gem-title">Yapper</div>
+            <div class="gem-desc">Evesdrop on a live candid AI-to-AI voice conversation.</div>
+            <div class="gem-tag">Live Convo</div>
+            <div class="gem-waveform">
+                <div class="wv-bar"></div><div class="wv-bar"></div>
+                <div class="wv-bar"></div><div class="wv-bar"></div>
+                <div class="wv-bar"></div>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- ── Shared Settings ── -->
+    <div class="settings-section">
+        <div class="settings-toggle" onclick="toggleSettings()">
+            <div class="settings-toggle-left">
+                <span class="settings-toggle-icon">🔑</span>
+                <div>
+                    <div class="settings-toggle-text">Suite Settings</div>
+                    <div class="settings-toggle-sub">API keys shared across all gems</div>
+                </div>
+            </div>
+            <span class="settings-toggle-arrow" id="settings-arrow">▼</span>
+        </div>
+        <div class="settings-panel" id="settings-panel">
+            <div class="form-group">
+                <label>🐟 Fish Audio API Key</label>
+                <input type="password" id="fish-key" placeholder="fish_xxxxxxxxxxxxxxxx…">
+            </div>
+            <div class="form-group">
+                <label>✨ Gemini API Key</label>
+                <input type="password" id="gemini-key" placeholder="AIza…">
+            </div>
+            <div class="form-group">
+                <label>🔗 Fish Proxy Server (optional)</label>
+                <input type="text" id="proxy-url" placeholder="http://localhost:8010">
+            </div>
+            <button class="btn-save" onclick="saveKeys()">💾 Save to All Apps</button>
+            <div id="key-status" class="key-status missing" style="display:none"></div>
+        </div>
+    </div>
+
+    <footer>
+        Made with <span>♥</span> by The Devilish Labs Team · Audio Suite v1.0
+    </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Particle Canvas ──────────────────────────────────────────────
+(function() {
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    const COLORS = ['rgba(167,139,250,', 'rgba(0,255,231,', 'rgba(255,45,120,', 'rgba(245,158,11,'];
+
+    function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+
+    function mkParticle() {
+        const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+        return {
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: Math.random() * 1.5 + 0.3,
+            vx: (Math.random() - 0.5) * 0.25,
+            vy: (Math.random() - 0.5) * 0.25,
+            alpha: Math.random() * 0.4 + 0.05,
+            color: c,
+            pulse: Math.random() * Math.PI * 2,
+            pulseSpeed: Math.random() * 0.02 + 0.005,
+        };
+    }
+
+    function init() {
+        resize();
+        particles = Array.from({ length: 80 }, mkParticle);
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        ctx.strokeStyle = 'rgba(167,139,250,0.025)';
+        ctx.lineWidth = 1;
+        const gridSize = 60;
+        for (let x = 0; x < W; x += gridSize) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+        }
+        for (let y = 0; y < H; y += gridSize) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        }
+
+        for (const p of particles) {
+            p.pulse += p.pulseSpeed;
+            const a = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.color + a + ')';
+            ctx.fill();
+
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+            if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', resize);
+    init();
+    draw();
+})();
+
+// ── Settings ─────────────────────────────────────────────────────
+function toggleSettings() {
+    const panel = document.getElementById('settings-panel');
+    const arrow = document.getElementById('settings-arrow');
+    const isOpen = panel.classList.contains('open');
+    panel.classList.toggle('open');
+    arrow.classList.toggle('open');
+    if (!isOpen) loadKeyFields();
+}
+
+function loadKeyFields() {
+    document.getElementById('fish-key').value   = localStorage.getItem('devilish_fish_key') || '';
+    document.getElementById('gemini-key').value = localStorage.getItem('devilish_gemini_key') || '';
+    document.getElementById('proxy-url').value  = localStorage.getItem('devilish_server_base') || '';
+    updateKeyStatus();
+}
+
+function saveKeys() {
+    const fish   = document.getElementById('fish-key').value.trim();
+    const gemini = document.getElementById('gemini-key').value.trim();
+    const proxy  = document.getElementById('proxy-url').value.trim();
+
+    if (fish)   localStorage.setItem('devilish_fish_key', fish);
+    if (gemini) localStorage.setItem('devilish_gemini_key', gemini);
+    if (proxy)  localStorage.setItem('devilish_server_base', proxy);
+    else        localStorage.removeItem('devilish_server_base');
+
+    updateKeyStatus();
+    showToast('🔑 Keys saved — all gems are ready!');
+}
+
+function updateKeyStatus() {
+    const fish   = localStorage.getItem('devilish_fish_key');
+    const gemini = localStorage.getItem('devilish_gemini_key');
+    const el = document.getElementById('key-status');
+    el.style.display = 'flex';
+
+    if (fish && gemini) {
+        el.className = 'key-status ok';
+        el.textContent = '✅ Both API keys configured — all gems unlocked';
+    } else if (fish) {
+        el.className = 'key-status missing';
+        el.textContent = '⚠️ Fish key set. Add Gemini key for PodcastGen.';
+    } else if (gemini) {
+        el.className = 'key-status missing';
+        el.textContent = '⚠️ Gemini key set. Add Fish key for voice synthesis.';
+    } else {
+        el.className = 'key-status missing';
+        el.textContent = '⚠️ No keys set. Add Fish + Gemini to unlock all gems.';
+    }
+}
+
+// ── Toast ─────────────────────────────────────────────────────────
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+    const fish   = localStorage.getItem('devilish_fish_key');
+    const gemini = localStorage.getItem('devilish_gemini_key');
+    if (!fish || !gemini) {
+        setTimeout(() => showToast('👋 Set your API keys in Suite Settings to get started!'), 1200);
+    }
+
+    const cards = document.querySelectorAll('.gem-card');
+    cards.forEach((card, i) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(24px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+        setTimeout(() => {
+            card.style.opacity = '';
+            card.style.transform = '';
+        }, 200 + i * 100);
+    });
+});
+
+(function(){
+  const h = document.getElementById('scroll-hint');
+  if(!h) return;
+  function updateHint(){
+    const scrolled = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+    if (scrolled > 60) {
+      h.classList.add('hidden');
+    } else {
+      h.classList.remove('hidden');
+    }
+  }
+  window.addEventListener('scroll', updateHint, {passive:true});
+  updateHint();
+})();
+</script>
+</body>
+</html>
