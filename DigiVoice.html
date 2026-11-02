@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DigiVoice™ v5.0 — AI Voice Studio</title>
+    <style>
+        /* ═══════════════════════════════════════════════════════
+           DESIGN SYSTEM — Dark + Neon Cyan + Liquid Glass
+           ═══════════════════════════════════════════════════════ */
+        :root {
+            --bg-deep:      #050810;
+            --bg-mid:       #090d1a;
+            --bg-surface:   #0d1220;
+            --neon:         #00ffe7;
+            --neon-dim:     rgba(0,255,231,0.18);
+            --neon-glow:    rgba(0,255,231,0.35);
+            --neon-soft:    rgba(0,255,231,0.08);
+            --accent:       #7c3aed;
+            --accent-dim:   rgba(124,58,237,0.2);
+            --accent-glow:  rgba(124,58,237,0.4);
+            --pink:         #ff2d78;
+            --pink-dim:     rgba(255,45,120,0.15);
+            --text-primary: #e8f4f8;
+            --text-muted:   #6b8499;
+            --text-dim:     #3a4f60;
+            --glass-bg:     rgba(13,18,32,0.65);
+            --glass-border: rgba(0,255,231,0.12);
+            --glass-blur:   blur(18px);
+            --radius-lg:    18px;
+            --radius-md:    12px;
+            --radius-sm:    8px;
+            --shadow-neon:  0 0 20px rgba(0,255,231,0.2), 0 4px 24px rgba(0,0,0,0.6);
+            --shadow-card:  0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: var(--bg-deep);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%; left: -10%;
+            width: 60vw; height: 60vw;
+            background: radial-gradient(circle, rgba(0,255,231,0.04) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: 10%; right: -15%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 12px 14px; position: relative; z-index: 1; }
+
+        header { text-align: center; padding: 20px 0 14px; position: relative; }
+        .logo-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 4px; }
+        .hub-back {
+            position: absolute; top: 20px; left: 0;
+            display: flex; align-items: center; gap: 5px;
+            color: var(--text-muted); font-size: 0.75rem; font-weight: 600;
+            text-decoration: none; letter-spacing: 0.3px;
+            padding: 5px 10px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            transition: all 0.2s;
+        }
+        .hub-back:hover { color: var(--neon); border-color: var(--neon-dim); background: var(--neon-soft); }
+        .logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--neon), var(--accent));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 0 16px var(--neon-glow);
+        }
+        h1 {
+            font-size: 1.9rem; font-weight: 800;
+            background: linear-gradient(90deg, var(--neon) 0%, #a78bfa 60%, var(--pink) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        .subtitle { color: var(--text-muted); font-size: 0.8rem; letter-spacing: 0.3px; }
+        .version-badge {
+            display: inline-block;
+            background: var(--neon-dim); border: 1px solid var(--neon); color: var(--neon);
+            font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+            letter-spacing: 0.5px; margin-left: 6px; vertical-align: middle;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: var(--radius-lg);
+            padding: 18px; margin-bottom: 14px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-card);
+            position: relative; overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,255,231,0.3), transparent);
+        }
+        .card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; color: var(--neon); display: flex; align-items: center; gap: 8px; }
+
+        /* ── Forms ── */
+        .form-group { margin-bottom: 14px; }
+        label {
+            display: block; margin-bottom: 6px; color: var(--text-muted);
+            font-weight: 500; font-size: 0.8rem; letter-spacing: 0.3px; text-transform: uppercase;
+        }
+        input[type="text"], input[type="password"], input[type="email"], textarea, select {
+            width: 100%; padding: 12px 14px;
+            background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius-sm); color: var(--text-primary);
+            font-size: 0.9rem; transition: border-color 0.3s, box-shadow 0.3s;
+            -webkit-appearance: none;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none; border-color: var(--neon);
+            box-shadow: 0 0 0 3px var(--neon-soft), 0 0 12px var(--neon-dim);
+        }
+        textarea { min-height: 100px; resize: vertical; }
+        select option { background: var(--bg-mid); color: var(--text-primary); }
+
+        /* ── File Upload ── */
+        .file-upload {
+            border: 2px dashed rgba(255,255,255,0.12); border-radius: var(--radius-md);
+            padding: 28px 16px; text-align: center; cursor: pointer; transition: all 0.3s; display: block;
+        }
+        .file-upload:hover { border-color: var(--neon); background: var(--neon-soft); }
+        .file-upload.has-file { border-color: #22c55e; border-style: solid; background: rgba(34,197,94,0.06); }
+        .file-upload input { display: none; }
+        .file-upload-icon { font-size: 2rem; margin-bottom: 8px; }
+        .file-upload p { font-size: 0.82rem; color: var(--text-muted); }
+
+        /* ── Buttons ── */
+        .btn {
+            padding: 13px 22px; border: none; border-radius: var(--radius-sm);
+            font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.25s;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 6px; letter-spacing: 0.2px; position: relative; overflow: hidden;
+        }
+        .btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0); transition: background 0.2s; }
+        .btn:active::after { background: rgba(255,255,255,0.08); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--neon) 0%, var(--accent) 100%);
+            color: #000; width: 100%; box-shadow: 0 4px 20px var(--neon-dim);
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px var(--neon-glow); }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.06); color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+        .btn-neon {
+            background: transparent; color: var(--neon); border: 1px solid var(--neon);
+            box-shadow: 0 0 12px var(--neon-dim), inset 0 0 12px var(--neon-soft);
+        }
+        .btn-neon:hover:not(:disabled) { background: var(--neon-soft); box-shadow: 0 0 20px var(--neon-glow), inset 0 0 16px var(--neon-dim); }
+
+        .btn-danger { background: var(--pink-dim); color: var(--pink); border: 1px solid rgba(255,45,120,0.3); }
+        .btn-danger:hover:not(:disabled) { background: rgba(255,45,120,0.25); }
+
+        .btn-small { padding: 7px 14px; font-size: 0.75rem; }
+        .btn-group { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .btn-group .btn { flex: 1; min-width: 0; }
+
+        /* ── Messages ── */
+        .message {
+            padding: 12px 14px; border-radius: var(--radius-sm); margin-bottom: 12px;
+            display: none; font-size: 0.82rem; font-weight: 500;
+        }
+        .message.visible { display: block; }
+        .message.success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; }
+        .message.error   { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
+        .message.info    { background: var(--neon-soft); border: 1px solid rgba(0,255,231,0.2); color: var(--neon); }
+        .message.warning { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); color: #fbbf24; }
+
+        /* ── Tab Bar ── */
+        .tab-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(5,8,16,0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(0,255,231,0.1);
+            display: flex; justify-content: space-around;
+            padding: 8px 0 env(safe-area-inset-bottom, 8px) 0; z-index: 100;
+        }
+        .tab-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            background: none; border: none; color: var(--text-dim);
+            font-size: 0.6rem; font-weight: 600; letter-spacing: 0.3px;
+            cursor: pointer; padding: 6px 8px; border-radius: var(--radius-sm);
+            transition: all 0.25s; min-width: 52px; text-transform: uppercase;
+        }
+        .tab-btn .tab-icon { font-size: 1.2rem; }
+        .tab-btn:active { opacity: 0.6; }
+        .tab-btn.active { color: var(--neon); background: var(--neon-soft); }
+        .tab-btn.active .tab-icon { filter: drop-shadow(0 0 6px var(--neon)); }
+
+        /* ── Pages ── */
+        .page { display: none; animation: fadeUp 0.25s ease; }
+        .page.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── Voice Cards ── */
+        .voice-card {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 14px; background: rgba(0,0,0,0.25); border-radius: var(--radius-md);
+            margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); gap: 10px; transition: border-color 0.2s;
+        }
+        .voice-card:hover { border-color: var(--glass-border); }
+        .voice-card h4 { font-size: 0.88rem; margin-bottom: 3px; color: var(--text-primary); }
+        .voice-date { color: var(--text-dim); font-size: 0.72rem; }
+        .voice-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+        .use-voice-btn {
+            padding: 6px 14px; background: var(--accent-dim); border: 1px solid rgba(124,58,237,0.4);
+            border-radius: 6px; color: #a78bfa; cursor: pointer; font-size: 0.72rem; font-weight: 600; transition: all 0.2s;
+        }
+        .use-voice-btn:hover { background: rgba(124,58,237,0.35); }
+
+        .delete-voice-btn {
+            padding: 6px 10px; background: var(--pink-dim); border: 1px solid rgba(255,45,120,0.3);
+            border-radius: 6px; color: var(--pink); cursor: pointer; font-size: 0.72rem; transition: all 0.2s;
+        }
+        .delete-voice-btn:hover { background: rgba(255,45,120,0.25); }
+
+        .empty-state { text-align: center; color: var(--text-dim); padding: 36px 0; font-size: 0.88rem; }
+        .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.4; }
+
+        /* ── Audio Output ── */
+        .output-section {
+            margin-top: 14px; padding: 16px; background: rgba(0,0,0,0.2);
+            border-radius: var(--radius-md); display: none; border: 1px solid rgba(34,197,94,0.15);
+        }
+        .output-section.visible { display: block; }
+        .output-section h3 { font-size: 0.85rem; margin-bottom: 10px; color: #22c55e; }
+
+        audio { width: 100%; margin-top: 8px; border-radius: 6px; accent-color: var(--neon); }
+
+        .selected-voice {
+            background: var(--neon-soft); border: 1px solid rgba(0,255,231,0.25);
+            border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 12px;
+            display: none; align-items: center; justify-content: space-between;
+            font-size: 0.82rem; color: var(--neon);
+        }
+        .selected-voice.visible { display: flex; }
+        .clear-voice { background: none; border: none; color: var(--pink); cursor: pointer; font-size: 1.2rem; padding: 0 4px; }
+
+        .instructions {
+            background: rgba(124,58,237,0.06); border: 1px solid rgba(124,58,237,0.15);
+            border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px; font-size: 0.82rem;
+        }
+        .instructions h3 { color: #a78bfa; font-size: 0.9rem; margin-bottom: 6px; font-weight: 700; }
+        .instructions p { color: var(--text-muted); line-height: 1.6; }
+
+        /* ── Loading ── */
+        .loading {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.2); border-radius: 50%;
+            border-top-color: #fff; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
+
+        /* ── Transcript ── */
+        .transcript-box {
+            background: rgba(0,0,0,0.3); border-radius: var(--radius-sm); padding: 14px; margin-top: 12px;
+            min-height: 60px; font-size: 0.88rem; line-height: 1.6; white-space: pre-wrap;
+            color: var(--text-primary); max-height: 300px; overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .transcript-box:empty::before { content: "Your transcription will appear here…"; color: var(--text-dim); }
+
+        /* ── GIF Playback Overlay ── */
+        .playback-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; align-items: center; justify-content: center;
+            flex-direction: column; z-index: 999; backdrop-filter: blur(8px);
+        }
+        .playback-overlay.visible { display: flex; }
+        .playback-overlay img { max-width: 85vw; max-height: 55vh; border-radius: var(--radius-lg); box-shadow: 0 20px 60px rgba(0,0,0,0.7); }
+        .playback-overlay .overlay-label { color: var(--text-muted); font-size: 0.82rem; margin-top: 16px; text-align: center; }
+        .stop-playback-btn {
+            margin-top: 20px; padding: 14px 40px;
+            background: linear-gradient(90deg, var(--pink), #dc2626);
+            border: none; border-radius: 50px; color: #fff;
+            font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 6px 24px rgba(255,45,120,0.35); transition: all 0.25s;
+        }
+        .stop-playback-btn:hover { transform: scale(1.05); }
+
+        /* ── Audio Library ── */
+        .audio-lib-card {
+            background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: var(--radius-md); padding: 14px; margin-bottom: 10px; transition: border-color 0.2s;
+        }
+        .audio-lib-card:hover { border-color: var(--glass-border); }
+        .audio-lib-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .audio-lib-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+        .audio-lib-meta { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
+        .audio-lib-tag {
+            display: inline-block; padding: 2px 8px; border-radius: 20px;
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .tag-tts { background: var(--neon-dim); color: var(--neon); border: 1px solid rgba(0,255,231,0.25); }
+        .tag-voice { background: var(--accent-dim); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+        .audio-lib-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+
+        /* ── Settings ── */
+        .settings-section { margin-bottom: 20px; }
+        .settings-section h3 {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--neon); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+        }
+        .settings-section h3::after { content: ''; flex: 1; height: 1px; background: rgba(0,255,231,0.15); }
+
+        .model-row { display: flex; gap: 8px; align-items: flex-end; }
+        .model-row input { flex: 1; }
+        .model-status {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .model-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+        .model-status.ok { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+        .model-status.ok::before { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+        .model-status.warn { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+        .model-status.warn::before { background: #fbbf24; }
+        .model-status.checking { background: rgba(107,132,153,0.15); color: var(--text-muted); border: 1px solid rgba(107,132,153,0.2); }
+        .model-status.checking::before { background: var(--text-muted); animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .key-row { display: flex; gap: 8px; }
+        .key-row input { flex: 1; }
+
+        .api-status {
+            display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
+            border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+        }
+        .api-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+        .api-status.connected { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+        .api-status.connected::before { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+        .api-status.disconnected { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .api-status.disconnected::before { background: #ef4444; }
+
+        /* ── Section Dividers ── */
+        .section-label {
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-dim); margin: 18px 0 10px; display: flex; align-items: center; gap: 8px;
+        }
+        .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
+
+        .small-note { color: var(--text-dim); font-size: 0.72rem; margin-top: 4px; line-height: 1.4; }
+        a { color: var(--neon); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .neon-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--neon-dim), transparent); margin: 16px 0; }
+
+        @media (min-width: 600px) { .container { max-width: 540px; } h1 { font-size: 2.1rem; } }
+    </style>
+</head>
+<body>
+
+<!-- ── GIF Playback Overlay ── -->
+<div class="playback-overlay" id="playback-overlay">
+    <img src="" alt="Playing..." id="overlay-gif">
+    <p class="overlay-label">🔊 Audio Playing…</p>
+    <button class="stop-playback-btn" id="stop-playback-btn">⏹ Stop Playback</button>
+</div>
+
+<div class="container">
+    <header>
+        <a href="index.html" class="hub-back">← Hub</a>
+        <div class="logo-row">
+            <div class="logo-icon">🎙️</div>
+            <h1>DigiVoice™<span class="version-badge">v5.0</span></h1>
+        </div>
+        <p class="subtitle">AI Voice Cloning Studio · Devilish Labs</p>
+    </header>
+
+    <div class="message" id="global-message"></div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE: SYNTH
+    ═══════════════════════════════════════════ -->
+    <div id="quick-page" class="page active">
+        <div class="card">
+            <h2>⚡ Quick Synthesis</h2>
+            <p style="color:var(--text-muted);font-size:0.82rem;margin-bottom:14px;">Use community voices for instant TTS</p>
+
+            <div class="form-group">
+                <label>Select a Voice</label>
+                <select id="quick-voice">
+                    <option value="">— Choose a voice —</option>
+                    <optgroup label="★ My Clones" id="quick-my-voices-group"></optgroup>
+                    <optgroup label="🌐 Community Voices" id="quick-community-voices-group"></optgroup>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Text to Speak</label>
+                <textarea id="quick-text" placeholder="Enter text to convert to speech…"></textarea>
+            </div>
+
+            <button class="btn btn-primary" onclick="submitQuickSynthesis()" id="quick-generate-btn">🔊 Generate Speech</button>
+
+            <div class="output-section" id="quick-output">
+                <h3>✅ Generated Audio</h3>
+                <audio id="quick-audio" controls></audio>
+                <div class="btn-group">
+                    <button class="btn btn-secondary btn-small" onclick="downloadAudio('quick')">📥 Download</button>
+                    <button class="btn btn-secondary btn-small" onclick="saveAudioToLibrary('quick')">💾 Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE: CLONE
+    ═══════════════════════════════════════════ -->
+    <div id="clone-page" class="page">
+        <div class="instructions">
+            <h3>📖 How to Clone</h3>
+            <p>Upload a clean 10–30 second audio sample. Minimal background noise gives the best results. After cloning, you can generate speech from any text.</p>
+        </div>
+
+        <div class="card">
+            <h2>Step 1 — Upload Reference</h2>
+            <div class="form-group">
+                <label class="file-upload" id="file-label">
+                    <div class="file-upload-icon">🎵</div>
+                    <p id="file-label-text">Tap to choose audio file</p>
+                    <p style="color:var(--text-dim);font-size:0.78rem;margin-top:4px;">MP3, WAV, M4A (10–30 sec)</p>
+                    <input type="file" id="audio-file" accept="audio/*" onchange="handleFileSelect(this)">
+                </label>
+            </div>
+            <div class="form-group">
+                <label>Voice Name</label>
+                <input type="text" id="voice-name" placeholder="e.g. My Custom Voice">
+            </div>
+            <div class="form-group">
+                <label>Description (optional)</label>
+                <input type="text" id="voice-desc" placeholder="e.g. Deep male, American accent">
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Step 2 — Generate Speech</h2>
+
+            <div class="selected-voice" id="selected-voice">
+                <span id="selected-voice-name">No voice selected</span>
+                <button class="clear-voice" onclick="clearSelectedVoice()">×</button>
+            </div>
+
+            <div class="form-group">
+                <label>Text to Speak</label>
+                <textarea id="clone-text" placeholder="Enter text to convert to speech…"></textarea>
+            </div>
+
+            <button class="btn btn-primary" onclick="submitCloneRequest()" id="clone-generate-btn">🚀 Clone & Generate</button>
+
+            <div class="btn-group" style="margin-top:10px">
+                <button class="btn btn-secondary btn-small" onclick="saveToLibrary()" id="save-library-btn">💾 Save Voice to Library</button>
+            </div>
+
+            <div class="output-section" id="clone-output">
+                <h3>✅ Generated Audio</h3>
+                <audio id="clone-audio" controls></audio>
+                <div class="btn-group">
+                    <button class="btn btn-secondary btn-small" onclick="downloadAudio('clone')">📥 Download</button>
+                    <button class="btn btn-secondary btn-small" onclick="saveAudioToLibrary('clone')">💾 Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE: LIBRARY
+    ═══════════════════════════════════════════ -->
+    <div id="library-page" class="page">
+        <div class="card">
+            <h2>🎤 My Voice Clones</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <p style="color:var(--text-muted);font-size:0.8rem;margin:0;">Your cloned voice models</p>
+                <button class="btn btn-neon btn-small" onclick="syncVoicesWithProxy()">🔄 Sync</button>
+            </div>
+            <div id="my-voices-list">
+                <div class="empty-state"><div class="empty-icon">🎤</div><p>No voices yet. Clone one or sync!</p></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎵 My Audio Library</h2>
+            <p style="color:var(--text-muted);font-size:0.8rem;margin-bottom:14px;">Generated audio saved for re-download</p>
+            <div id="my-audio-list">
+                <div class="empty-state"><div class="empty-icon">🎵</div><p>No saved audio yet.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE: TRANSCRIBE
+    ═══════════════════════════════════════════ -->
+    <div id="transcribe-page" class="page">
+        <div class="card">
+            <h2>📝 Transcribe Audio</h2>
+            <p style="color:var(--text-muted);font-size:0.82rem;margin-bottom:14px;">Convert audio files to text using Fish Audio ASR</p>
+
+            <div class="form-group">
+                <label class="file-upload" id="transcribe-file-label">
+                    <div class="file-upload-icon">🎧</div>
+                    <p id="transcribe-file-text">Tap to choose audio file</p>
+                    <p style="color:var(--text-dim);font-size:0.78rem;margin-top:4px;">MP3, WAV, M4A, OGG</p>
+                    <input type="file" id="transcribe-file" accept="audio/*" onchange="handleTranscribeFile(this)">
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>Language (optional)</label>
+                <select id="transcribe-lang">
+                    <option value="">— Auto-detect —</option>
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="zh">Chinese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="ar">Arabic</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ru">Russian</option>
+                    <option value="it">Italian</option>
+                    <option value="nl">Dutch</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Options</label>
+                <div style="display:flex;gap:14px;font-size:0.82rem;color:var(--text-muted);flex-wrap:wrap;">
+                    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;text-transform:none;font-size:0.82rem;color:var(--text-muted);">
+                        <input type="checkbox" id="transcribe-timestamps" checked> Timestamps
+                    </label>
+                    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;text-transform:none;font-size:0.82rem;color:var(--text-muted);">
+                        <input type="checkbox" id="transcribe-diarize"> Speaker Diarization
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="submitTranscription()" id="transcribe-btn">🎯 Transcribe Audio</button>
+
+            <div class="output-section" id="transcribe-output" style="display:none">
+                <h3>📄 Transcription Result</h3>
+                <div class="transcript-box" id="transcript-result"></div>
+                <div class="btn-group" style="margin-top:10px">
+                    <button class="btn btn-secondary btn-small" onclick="copyTranscript()">📋 Copy</button>
+                    <button class="btn btn-secondary btn-small" onclick="downloadTranscript()">📥 Download .txt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE: SETTINGS
+    ═══════════════════════════════════════════ -->
+    <div id="settings-page" class="page">
+        <div class="card">
+            <h2>⚙️ Network & API Keys</h2>
+            <p style="color:var(--text-muted);font-size:0.8rem;margin-bottom:16px;">Keys are shared across all Devilish Labs apps via a unified namespace.</p>
+
+            <div class="settings-section">
+                <h3>🐟 Fish Audio</h3>
+                <div class="form-group">
+                    <label>API Key</label>
+                    <div class="key-row">
+                        <input type="password" id="fish-api-key" placeholder="fish_xxxxxxxxxxxxxxxx…">
+                        <button class="btn btn-neon btn-small" onclick="saveKeys()">Save</button>
+                    </div>
+                    <p class="small-note">Get yours at <a href="https://fish.audio" target="_blank">fish.audio</a> — powers Synth, Clone, Library & Transcribe.</p>
+                </div>
+                <div class="form-group">
+                    <label>Proxy Server (optional)</label>
+                    <div class="key-row">
+                        <input type="text" id="server-base" placeholder="http://localhost:8010">
+                    </div>
+                    <p class="small-note">Routes calls through your ZODIAX proxy. Leave blank to call Fish Audio directly.</p>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>✨ Google Gemini</h3>
+                <div class="form-group">
+                    <label>API Key</label>
+                    <div class="key-row">
+                        <input type="password" id="gemini-api-key" placeholder="AIzaxxxxxxxxxxxxxxxx…">
+                        <button class="btn btn-neon btn-small" onclick="saveKeys()">Save</button>
+                    </div>
+                    <p class="small-note">Get yours at <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a> — powers PodcastGen & Scripted Performance.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🤖 AI Model Configuration</h2>
+            <p style="color:var(--text-muted);font-size:0.8rem;margin-bottom:16px;">Model strings are user-editable. The app checks live availability on load.</p>
+
+            <div class="settings-section">
+                <h3>Script Generation Model</h3>
+                <div class="form-group">
+                    <label>Gemini Model (for writing scripts)</label>
+                    <div class="model-row">
+                        <input type="text" id="model-script" placeholder="gemini-3.5-flash">
+                        <span class="model-status checking" id="status-script">Checking…</span>
+                    </div>
+                    <p class="small-note">Recommended: <code style="color:var(--neon)">gemini-3.5-flash</code> (fast, cheap) or <code style="color:#a78bfa">gemini-2.5-pro</code> (richest output)</p>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>TTS Model (Gemini fallback)</h3>
+                <div class="form-group">
+                    <label>Gemini TTS Model</label>
+                    <div class="model-row">
+                        <input type="text" id="model-tts" placeholder="gemini-2.5-pro-preview-tts">
+                        <span class="model-status checking" id="status-tts">Checking…</span>
+                    </div>
+                    <p class="small-note">Recommended: <code style="color:var(--neon)">gemini-2.5-pro-preview-tts</code> (podcast/audiobook quality)</p>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="saveModelsAndCheck()">💾 Save & Check Models</button>
+            <div id="model-check-result" class="message" style="margin-top:12px;"></div>
+        </div>
+
+        <div class="card">
+            <h2>🎨 Playback Overlay</h2>
+            <p style="color:var(--text-muted);font-size:0.82rem;margin-bottom:14px;">Custom GIF shown while audio plays. Double-tap the overlay label to change it.</p>
+            <div id="overlay-preview" style="text-align:center;padding:20px;background:rgba(0,0,0,0.2);border-radius:var(--radius-md);border:1px dashed rgba(255,255,255,0.1);">
+                <p style="color:var(--text-dim);font-size:0.82rem;">No custom GIF set</p>
+            </div>
+            <button class="btn btn-secondary" style="margin-top:10px;width:100%" onclick="document.getElementById('gif-upload-input').click()">🖼 Upload Custom GIF</button>
+            <input type="file" id="gif-upload-input" accept="image/gif" style="display:none" onchange="handleGifUpload(this)">
+        </div>
+
+        <div class="card" style="text-align:center;padding:20px;">
+            <p style="color:var(--text-dim);font-size:0.75rem;letter-spacing:0.5px;text-transform:uppercase;">Devilish Labs · DigiVoice v5.0</p>
+            <p style="color:var(--text-dim);font-size:0.7rem;margin-top:4px;">Part of the Audio Suite</p>
+        </div>
+    </div>
+
+</div><!-- /container -->
+
+<!-- ── Bottom Tab Bar ── -->
+<div class="tab-bar">
+    <button class="tab-btn active" onclick="showPage('quick')" id="tab-quick">
+        <span class="tab-icon">⚡</span>Synth
+    </button>
+    <button class="tab-btn" onclick="showPage('clone')" id="tab-clone">
+        <span class="tab-icon">🎤</span>Clone
+    </button>
+    <button class="tab-btn" onclick="showPage('library')" id="tab-library">
+        <span class="tab-icon">📚</span>Library
+    </button>
+    <button class="tab-btn" onclick="showPage('transcribe')" id="tab-transcribe">
+        <span class="tab-icon">📝</span>Transcribe
+    </button>
+    <button class="tab-btn" onclick="showPage('settings')" id="tab-settings">
+        <span class="tab-icon">⚙️</span>Settings
+    </button>
+</div>
+
+<script src="voiceService.js" charset="utf-8"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  DigiVoice™ v5.0 — Devilish Labs Audio Suite
+//  Shared localStorage namespace: devilish_*
+// ═══════════════════════════════════════════════════════════════
+
+// ─── Shared Key Namespace ────────────────────────────────────────
+// All Devilish Labs apps read/write these same keys
+const DL = {
+    get fishKey()    { return localStorage.getItem('devilish_fish_key') || ''; },
+    get geminiKey()  { return localStorage.getItem('devilish_gemini_key') || ''; },
+    get serverBase() { return localStorage.getItem('devilish_server_base') || ''; },
+    get modelScript(){ return localStorage.getItem('devilish_model_script') || 'gemini-3.5-flash'; },
+    get modelTTS()   { return localStorage.getItem('devilish_model_tts') || 'gemini-2.5-pro-preview-tts'; },
+    get overlayGif() { return localStorage.getItem('devilish_overlay_gif') || ''; },
+    set fishKey(v)    { localStorage.setItem('devilish_fish_key', v); },
+    set geminiKey(v)  { localStorage.setItem('devilish_gemini_key', v); },
+    set serverBase(v) { localStorage.setItem('devilish_server_base', v); },
+    set modelScript(v){ localStorage.setItem('devilish_model_script', v); },
+    set modelTTS(v)   { localStorage.setItem('devilish_model_tts', v); },
+    set overlayGif(v) { localStorage.setItem('devilish_overlay_gif', v); },
+};
+
+// ─── State ──────────────────────────────────────────────────────
+let selectedVoiceId   = null;
+let selectedVoiceName = null;
+let audioBlobs        = { quick: null, clone: null };
+let myVoices          = [];
+let myAudioLibrary    = [];
+let lastTranscript    = '';
+
+// ─── Init ────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    // Load settings into UI
+    document.getElementById('fish-api-key').value  = DL.fishKey;
+    document.getElementById('gemini-api-key').value = DL.geminiKey;
+    document.getElementById('server-base').value    = DL.serverBase;
+    document.getElementById('model-script').value   = DL.modelScript;
+    document.getElementById('model-tts').value      = DL.modelTTS;
+
+    // Load saved data
+    const savedVoices = localStorage.getItem('digivoice_voices');
+    if (savedVoices) { myVoices = JSON.parse(savedVoices); renderVoiceLibrary(); }
+
+    const savedAudio = localStorage.getItem('digivoice_audio');
+    if (savedAudio) { myAudioLibrary = JSON.parse(savedAudio); renderAudioLibrary(); }
+
+    // Overlay GIF
+    if (DL.overlayGif) {
+        document.getElementById('overlay-gif').src = DL.overlayGif;
+        document.getElementById('overlay-preview').innerHTML = `<img src="${DL.overlayGif}" style="max-width:100%;max-height:120px;border-radius:8px;">`;
+    }
+
+    // Populate voice dropdowns (live from Fish Audio when key is present)
+    populateQuickVoiceDropdown();
+
+    // Check model availability if Gemini key is set
+    if (DL.geminiKey) checkModelAvailability();
+    else {
+        setModelStatus('script', 'warn', 'No key');
+        setModelStatus('tts', 'warn', 'No key');
+    }
+
+    // Attempt proxy sync silently
+    syncVoicesWithProxy();
+});
+
+// ─── Routing ─────────────────────────────────────────────────────
+function getServerBase() {
+    const addr = DL.serverBase.trim();
+    if (!addr) return null; // null = call Fish Audio directly
+    return addr.endsWith('/') ? addr.slice(0, -1) : addr;
+}
+
+function getFishEndpoint(path) {
+    const base = getServerBase();
+    if (base) return base + path;
+    if (location.protocol.startsWith('http') && String(location.port) === '2345') return path;
+    // DigiVoX APK: WebView serves from https://localhost — reach the on-device Termux dl_proxy
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return 'http://localhost:2345' + path;
+    const FISH = 'https://api.fish.audio';
+    const direct = {
+        '/tts':        FISH + '/v1/tts',
+        '/clone':      FISH + '/model',
+        '/my-voices':  FISH + '/model',
+        '/voices':     FISH + '/model',
+        '/transcribe': FISH + '/v1/asr',
+    };
+    if (direct[path]) return direct[path];
+    if (path.startsWith('/voice/')) return FISH + '/model/' + path.slice(7);
+    return FISH + path;
+}
+
+// ─── UI Helpers ───────────────────────────────────────────────────
+function showMessage(text, type) {
+    const m = document.getElementById('global-message');
+    m.textContent = text;
+    m.className = 'message visible ' + type;
+    clearTimeout(m._timer);
+    m._timer = setTimeout(() => { m.className = 'message'; }, 4500);
+}
+
+function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    document.getElementById(page + '-page').classList.add('active');
+    document.getElementById('tab-' + page).classList.add('active');
+    if (page === 'library') syncVoicesWithProxy();
+}
+
+function setButtonLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    if (loading) {
+        btn.disabled = true;
+        btn.dataset.original = btn.innerHTML;
+        btn.innerHTML = '<span class="loading"></span> Processing…';
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.original || 'Submit';
+    }
+}
+
+function handleFileSelect(input) {
+    const file = input.files[0];
+    const lbl = document.getElementById('file-label');
+    const txt = document.getElementById('file-label-text');
+    if (file) { lbl.classList.add('has-file'); txt.textContent = '✅ ' + file.name; }
+    else { lbl.classList.remove('has-file'); txt.textContent = 'Tap to choose audio file'; }
+}
+
+function handleTranscribeFile(input) {
+    const file = input.files[0];
+    const lbl = document.getElementById('transcribe-file-label');
+    const txt = document.getElementById('transcribe-file-text');
+    if (file) { lbl.classList.add('has-file'); txt.textContent = '✅ ' + file.name; document.getElementById('transcribe-output').style.display = 'none'; }
+    else { lbl.classList.remove('has-file'); txt.textContent = 'Tap to choose audio file'; }
+}
+
+function useVoice(voiceId, voiceName) {
+    selectedVoiceId = voiceId;
+    selectedVoiceName = voiceName;
+    document.getElementById('selected-voice-name').textContent = 'Using: ' + voiceName;
+    document.getElementById('selected-voice').classList.add('visible');
+    showPage('clone');
+}
+
+function clearSelectedVoice() {
+    selectedVoiceId = null;
+    selectedVoiceName = null;
+    document.getElementById('selected-voice').classList.remove('visible');
+}
+
+function populateQuickVoiceDropdown() {
+    const select = document.getElementById('quick-voice');
+    const current = select.value;
+
+    // Always render local myVoices first so the dropdown never stays empty
+    const myGroup = document.getElementById('quick-my-voices-group');
+    if (myGroup) {
+        myGroup.innerHTML = '';
+        myVoices.forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v.id;
+            opt.textContent = v.name;
+            myGroup.appendChild(opt);
+        });
+    }
+
+    // Fetch live community + my voices from Fish Audio (cached / proxied)
+    if (!DL.fishKey || typeof DigiVoX_VoiceService === 'undefined') return;
+    DigiVoX_VoiceService.populateSelect(select, {
+        placeholder: '— Choose a voice —',
+        myGroupLabel: '★ My Clones',
+        commGroupLabel: '🌐 Community Voices',
+        selectedId: current,
+    }).then(() => {
+        // Merge freshly fetched my voices into local library
+        const fresh = DigiVoX_VoiceService.state.myVoices;
+        if (fresh.length) {
+            const existingIds = new Set(myVoices.map(v => v.id));
+            fresh.forEach(v => {
+                if (!existingIds.has(v.id)) {
+                    myVoices.push({ id: v.id, name: v.name, desc: v.description || 'Synced from Fish Audio', date: v.createdAt });
+                }
+            });
+            localStorage.setItem('digivoice_voices', JSON.stringify(myVoices));
+        }
+    }).catch(e => console.warn('populateSelect failed:', e));
+}
+
+// ─── GIF Playback Overlay ─────────────────────────────────────────
+function showPlaybackOverlay() {
+    const overlay = document.getElementById('playback-overlay');
+    const gif = document.getElementById('overlay-gif');
+    if (!gif.src || gif.src === window.location.href) gif.src = '';
+    overlay.classList.add('visible');
+}
+function hidePlaybackOverlay() {
+    document.getElementById('playback-overlay').classList.remove('visible');
+    document.querySelectorAll('audio').forEach(a => a.pause());
+}
+document.getElementById('stop-playback-btn').addEventListener('click', hidePlaybackOverlay);
+document.addEventListener('play', e => { if (e.target.tagName === 'AUDIO') showPlaybackOverlay(); }, true);
+document.addEventListener('ended', e => { if (e.target.tagName === 'AUDIO') setTimeout(hidePlaybackOverlay, 600); }, true);
+document.querySelector('.overlay-label').addEventListener('dblclick', () => document.getElementById('gif-upload-input').click());
+
+function handleGifUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        DL.overlayGif = ev.target.result;
+        document.getElementById('overlay-gif').src = ev.target.result;
+        document.getElementById('overlay-preview').innerHTML = `<img src="${ev.target.result}" style="max-width:100%;max-height:120px;border-radius:8px;">`;
+        showMessage('Overlay GIF updated!', 'success');
+    };
+    reader.readAsDataURL(file);
+}
+
+// ─── Settings ─────────────────────────────────────────────────────
+function saveKeys() {
+    DL.fishKey   = document.getElementById('fish-api-key').value.trim();
+    DL.geminiKey = document.getElementById('gemini-api-key').value.trim();
+    DL.serverBase = document.getElementById('server-base').value.trim();
+    showMessage('Keys saved! All Devilish Labs apps will use these.', 'success');
+    syncVoicesWithProxy();
+}
+
+function saveModelsAndCheck() {
+    DL.modelScript = document.getElementById('model-script').value.trim() || 'gemini-3.5-flash';
+    DL.modelTTS    = document.getElementById('model-tts').value.trim() || 'gemini-2.5-pro-preview-tts';
+    document.getElementById('model-script').value = DL.modelScript;
+    document.getElementById('model-tts').value    = DL.modelTTS;
+    showMessage('Models saved. Checking availability…', 'info');
+    checkModelAvailability();
+}
+
+// ─── Live Model Deprecation Check ────────────────────────────────
+function setModelStatus(which, state, label) {
+    const el = document.getElementById('status-' + which);
+    if (!el) return;
+    el.className = 'model-status ' + state;
+    el.textContent = label;
+}
+
+async function checkModelAvailability() {
+    const key = DL.geminiKey;
+    if (!key) {
+        setModelStatus('script', 'warn', 'No key');
+        setModelStatus('tts',    'warn', 'No key');
+        return;
+    }
+
+    setModelStatus('script', 'checking', 'Checking…');
+    setModelStatus('tts',    'checking', 'Checking…');
+
+    try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}&pageSize=200`);
+        if (!res.ok) throw new Error('API error ' + res.status);
+        const data = await res.json();
+        const available = new Set((data.models || []).map(m => {
+            // model name is like "models/gemini-3.5-flash" — strip prefix
+            return m.name.replace('models/', '');
+        }));
+
+        const scriptModel = DL.modelScript;
+        const ttsModel    = DL.modelTTS;
+
+        if (available.has(scriptModel)) {
+            setModelStatus('script', 'ok', '✓ Available');
+        } else {
+            setModelStatus('script', 'warn', '⚠ Not found');
+            const result = document.getElementById('model-check-result');
+            result.className = 'message visible warning';
+            result.textContent = `⚠ Script model "${scriptModel}" not found in the live model list. It may be deprecated — check your model string.`;
+        }
+
+        if (available.has(ttsModel)) {
+            setModelStatus('tts', 'ok', '✓ Available');
+        } else {
+            setModelStatus('tts', 'warn', '⚠ Not found');
+            const result = document.getElementById('model-check-result');
+            result.className = 'message visible warning';
+            result.textContent += ` TTS model "${ttsModel}" not found either.`;
+        }
+
+        if (available.has(scriptModel) && available.has(ttsModel)) {
+            const result = document.getElementById('model-check-result');
+            result.className = 'message visible success';
+            result.textContent = '✅ Both models are live and available.';
+            setTimeout(() => { result.className = 'message'; }, 4000);
+        }
+
+    } catch (e) {
+        setModelStatus('script', 'warn', 'Check failed');
+        setModelStatus('tts',    'warn', 'Check failed');
+        console.warn('Model check failed:', e);
+    }
+}
+
+// ─── Fish Audio API ────────────────────────────────────────────────
+async function createVoiceModel(audioFile, voiceName, voiceDesc) {
+    const fd = new FormData();
+    fd.append('voices', audioFile);
+    fd.append('visibility', 'private');
+    fd.append('type', 'tts');
+    fd.append('title', voiceName);
+    fd.append('train_mode', 'fast');
+    if (voiceDesc) fd.append('description', voiceDesc);
+
+    const res = await fetch(getFishEndpoint('/clone'), {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + DL.fishKey },
+        body: fd
+    });
+    if (!res.ok) throw new Error('Clone failed: ' + await res.text());
+    return await res.json();
+}
+
+async function synthesizeSpeech(voiceId, text) {
+    const res = await fetch(getFishEndpoint('/tts'), {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + DL.fishKey,
+            'Content-Type': 'application/json',
+            'Accept': 'audio/mpeg'
+        },
+        body: JSON.stringify({ text, reference_id: voiceId, format: 'mp3', normalize: true })
+    });
+    if (!res.ok) throw new Error('TTS failed: ' + await res.text());
+    return await res.blob();
+}
+
+async function syncVoicesWithProxy() {
+    if (!DL.fishKey || typeof DigiVoX_VoiceService === 'undefined') return;
+    try {
+        const synced = await DigiVoX_VoiceService.fetchMyVoices({ pageSize: 50, sortBy: 'created_at', useCache: false });
+        if (synced.length > 0) {
+            const mapped = synced.map(v => ({
+                id:   v.id,
+                name: v.name,
+                desc: v.description || 'Synced from Fish Audio',
+                date: v.createdAt || new Date().toISOString()
+            }));
+            const syncedIds = new Set(mapped.map(v => v.id));
+            const localOnly = myVoices.filter(v => !syncedIds.has(v.id));
+            myVoices = [...mapped, ...localOnly];
+            localStorage.setItem('digivoice_voices', JSON.stringify(myVoices));
+            renderVoiceLibrary();
+            populateQuickVoiceDropdown();
+            showMessage(`Synced ${synced.length} voice(s) from Fish Audio`, 'success');
+        }
+    } catch (e) {
+        console.warn('Sync failed — using local cache.', e);
+    }
+}
+
+// ─── Quick Synthesis ──────────────────────────────────────────────
+async function submitQuickSynthesis() {
+    const voiceId = document.getElementById('quick-voice').value;
+    const text    = document.getElementById('quick-text').value.trim();
+    if (!DL.fishKey) return showMessage('Add your Fish Audio API key in Settings', 'error');
+    if (!voiceId)    return showMessage('Select a voice', 'error');
+    if (!text)       return showMessage('Enter text to synthesize', 'error');
+
+    setButtonLoading('quick-generate-btn', true);
+    try {
+        const blob = await synthesizeSpeech(voiceId, text);
+        audioBlobs.quick = blob;
+        document.getElementById('quick-audio').src = URL.createObjectURL(blob);
+        document.getElementById('quick-output').classList.add('visible');
+        showMessage('Audio generated!', 'success');
+    } catch (e) {
+        showMessage(e.message, 'error');
+    } finally {
+        setButtonLoading('quick-generate-btn', false);
+    }
+}
+
+// ─── Clone ────────────────────────────────────────────────────────
+async function submitCloneRequest() {
+    const text      = document.getElementById('clone-text').value.trim();
+    const voiceName = document.getElementById('voice-name').value.trim() || 'My Cloned Voice';
+    const voiceDesc = document.getElementById('voice-desc').value.trim();
+    const fileInput = document.getElementById('audio-file');
+
+    if (!DL.fishKey) return showMessage('Add your Fish Audio API key in Settings', 'error');
+    if (!text)       return showMessage('Enter text to synthesize', 'error');
+    if (!selectedVoiceId && !fileInput.files[0]) return showMessage('Upload audio or select a voice from library', 'error');
+
+    setButtonLoading('clone-generate-btn', true);
+    try {
+        let voiceId = selectedVoiceId;
+        if (!voiceId) {
+            showMessage('Creating voice model…', 'info');
+            const result = await createVoiceModel(fileInput.files[0], voiceName, voiceDesc);
+            voiceId = result._id || result.id;
+            if (!voiceId) throw new Error('Fish Audio did not return a voice ID. Check your API key and audio file.');
+            myVoices.push({ id: voiceId, name: voiceName, desc: voiceDesc, date: new Date().toISOString() });
+            localStorage.setItem('digivoice_voices', JSON.stringify(myVoices));
+            renderVoiceLibrary();
+            populateQuickVoiceDropdown();
+        }
+        const blob = await synthesizeSpeech(voiceId, text);
+        audioBlobs.clone = blob;
+        document.getElementById('clone-audio').src = URL.createObjectURL(blob);
+        document.getElementById('clone-output').classList.add('visible');
+        showMessage('Audio generated!', 'success');
+    } catch (e) {
+        showMessage(e.message, 'error');
+    } finally {
+        setButtonLoading('clone-generate-btn', false);
+    }
+}
+
+async function saveToLibrary() {
+    const voiceName = document.getElementById('voice-name').value.trim() || 'My Cloned Voice';
+    const voiceDesc = document.getElementById('voice-desc').value.trim();
+    const fileInput = document.getElementById('audio-file');
+    if (!DL.fishKey)        return showMessage('Add your Fish Audio API key in Settings', 'error');
+    if (!fileInput.files[0]) return showMessage('Upload an audio file first', 'error');
+
+    setButtonLoading('save-library-btn', true);
+    try {
+        showMessage('Creating voice model…', 'info');
+        const result = await createVoiceModel(fileInput.files[0], voiceName, voiceDesc);
+        const voiceId = result._id || result.id;
+        if (!voiceId) throw new Error('Fish Audio did not return a voice ID.');
+        myVoices.push({ id: voiceId, name: voiceName, desc: voiceDesc, date: new Date().toISOString() });
+        localStorage.setItem('digivoice_voices', JSON.stringify(myVoices));
+        renderVoiceLibrary();
+        populateQuickVoiceDropdown();
+        showMessage('Voice saved to library!', 'success');
+        fileInput.value = '';
+        document.getElementById('file-label').classList.remove('has-file');
+        document.getElementById('file-label-text').textContent = 'Tap to choose audio file';
+        document.getElementById('voice-name').value = '';
+        document.getElementById('voice-desc').value = '';
+    } catch (e) {
+        showMessage(e.message, 'error');
+    } finally {
+        setButtonLoading('save-library-btn', false);
+    }
+}
+
+// ─── Audio Library ────────────────────────────────────────────────
+function saveAudioToLibrary(type) {
+    const blob = audioBlobs[type];
+    if (!blob) return showMessage('No audio to save', 'error');
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const entry = {
+            id:      'audio_' + Date.now(),
+            title:   (type === 'quick' ? 'Quick Synth' : 'Clone Output') + ' — ' + new Date().toLocaleTimeString(),
+            type:    'tts',
+            date:    new Date().toISOString(),
+            dataUrl: e.target.result
+        };
+        myAudioLibrary.unshift(entry);
+        if (myAudioLibrary.length > 20) myAudioLibrary = myAudioLibrary.slice(0, 20);
+        localStorage.setItem('digivoice_audio', JSON.stringify(myAudioLibrary));
+        renderAudioLibrary();
+        showMessage('Audio saved to library!', 'success');
+    };
+    reader.readAsDataURL(blob);
+}
+
+function renderAudioLibrary() {
+    const c = document.getElementById('my-audio-list');
+    if (!myAudioLibrary.length) {
+        c.innerHTML = '<div class="empty-state"><div class="empty-icon">🎵</div><p>No saved audio yet.</p></div>';
+        return;
+    }
+    c.innerHTML = myAudioLibrary.map((a, i) => `
+        <div class="audio-lib-card">
+            <div class="audio-lib-header">
+                <div>
+                    <div class="audio-lib-title">${escHtml(a.title)}</div>
+                    <div class="audio-lib-meta">${new Date(a.date).toLocaleString()}</div>
+                </div>
+                <span class="audio-lib-tag tag-tts">TTS</span>
+            </div>
+            <audio controls src="${a.dataUrl}" style="width:100%;margin:6px 0"></audio>
+            <div class="audio-lib-actions">
+                <button class="btn btn-secondary btn-small" onclick="downloadSavedAudio(${i})">📥 Download</button>
+                <button class="btn btn-danger btn-small" onclick="deleteAudio(${i})">🗑 Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function downloadSavedAudio(index) {
+    const a = myAudioLibrary[index];
+    const link = document.createElement('a');
+    link.href = a.dataUrl;
+    link.download = 'digivoice-' + Date.now() + '.mp3';
+    link.click();
+}
+
+function deleteAudio(index) {
+    if (confirm('Delete this audio clip?')) {
+        myAudioLibrary.splice(index, 1);
+        localStorage.setItem('digivoice_audio', JSON.stringify(myAudioLibrary));
+        renderAudioLibrary();
+        showMessage('Audio deleted', 'success');
+    }
+}
+
+// ─── Voice Library ────────────────────────────────────────────────
+function renderVoiceLibrary() {
+    const c = document.getElementById('my-voices-list');
+    if (!myVoices.length) {
+        c.innerHTML = '<div class="empty-state"><div class="empty-icon">🎤</div><p>No voices yet. Clone one or sync!</p></div>';
+        return;
+    }
+    c.innerHTML = myVoices.map((v, i) => `
+        <div class="voice-card">
+            <div>
+                <h4>${escHtml(v.name)}</h4>
+                <p class="voice-date">${v.desc ? escHtml(v.desc) + ' · ' : ''}${new Date(v.date).toLocaleDateString()}</p>
+            </div>
+            <div class="voice-actions">
+                <button class="use-voice-btn" onclick="useVoice('${v.id}','${escHtml(v.name)}')">Use</button>
+                <button class="delete-voice-btn" onclick="deleteVoice(${i})">🗑</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function deleteVoice(index) {
+    const voice = myVoices[index];
+    if (!confirm(`Delete "${voice.name}" from your library?`)) return;
+    try {
+        await fetch(getFishEndpoint(`/voice/${voice.id}`), {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + DL.fishKey }
+        });
+    } catch (e) { console.warn('Remote delete failed, removing locally only.'); }
+    myVoices.splice(index, 1);
+    localStorage.setItem('digivoice_voices', JSON.stringify(myVoices));
+    renderVoiceLibrary();
+    populateQuickVoiceDropdown();
+    showMessage('Voice deleted', 'success');
+}
+
+// ─── Download ─────────────────────────────────────────────────────
+function downloadAudio(type) {
+    const blob = audioBlobs[type];
+    if (!blob) return showMessage('No audio to download', 'error');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'digivoice-' + Date.now() + '.mp3';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ─── Transcription ────────────────────────────────────────────────
+async function submitTranscription() {
+    const fileInput  = document.getElementById('transcribe-file');
+    const file       = fileInput.files[0];
+    const lang       = document.getElementById('transcribe-lang').value;
+    const timestamps = document.getElementById('transcribe-timestamps').checked;
+    const diarize    = document.getElementById('transcribe-diarize').checked;
+
+    if (!DL.fishKey) return showMessage('Add your Fish Audio API key in Settings', 'error');
+    if (!file)       return showMessage('Select an audio file to transcribe', 'error');
+
+    setButtonLoading('transcribe-btn', true);
+    try {
+        showMessage('Transcribing audio…', 'info');
+        const formData = new FormData();
+        formData.append('audio', file);
+        const payload = {};
+        if (lang)       payload.language  = lang;
+        if (timestamps) payload.timestamp = true;
+        if (diarize)    payload.diarize   = true;
+        formData.append('data', JSON.stringify(payload));
+
+        const url = getFishEndpoint('/transcribe');
+
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + DL.fishKey },
+            body: formData
+        });
+        if (!res.ok) throw new Error('Transcription failed: ' + await res.text());
+        const result = await res.json();
+
+        let transcriptText = '';
+        if (typeof result === 'string') {
+            transcriptText = result;
+        } else if (result.text) {
+            transcriptText = result.text;
+        } else if (result.results && Array.isArray(result.results)) {
+            transcriptText = result.results.map(r => r.text || r).join('\n');
+        } else if (result.segments && Array.isArray(result.segments)) {
+            transcriptText = result.segments.map(s => {
+                const start   = s.start != null ? `[${formatTime(s.start)}] ` : '';
+                const speaker = s.speaker != null ? `Speaker ${s.speaker}: ` : '';
+                return `${start}${speaker}${s.text}`;
+            }).join('\n');
+        } else {
+            transcriptText = JSON.stringify(result, null, 2);
+        }
+
+        lastTranscript = transcriptText;
+        document.getElementById('transcript-result').textContent = transcriptText;
+        document.getElementById('transcribe-output').style.display = 'block';
+        showMessage('Transcription complete!', 'success');
+    } catch (e) {
+        showMessage(e.message, 'error');
+    } finally {
+        setButtonLoading('transcribe-btn', false);
+    }
+}
+
+function formatTime(seconds) {
+    const m  = Math.floor(seconds / 60);
+    const s  = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 1000);
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
+}
+
+function copyTranscript() {
+    if (!lastTranscript) return showMessage('Nothing to copy', 'error');
+    navigator.clipboard.writeText(lastTranscript)
+        .then(() => showMessage('Copied to clipboard!', 'success'))
+        .catch(() => {
+            const el = document.createElement('textarea');
+            el.value = lastTranscript;
+            document.body.appendChild(el); el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showMessage('Copied!', 'success');
+        });
+}
+
+function downloadTranscript() {
+    if (!lastTranscript) return showMessage('Nothing to download', 'error');
+    const blob = new Blob([lastTranscript], { type: 'text/plain' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'digivoice-transcript-' + Date.now() + '.txt';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ─── Utility ──────────────────────────────────────────────────────
+function escHtml(t) {
+    const d = document.createElement('div');
+    d.textContent = t || '';
+    return d.innerHTML;
+}
+</script>
+<!-- Eruda mobile debugger -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+</body>
+</html>
