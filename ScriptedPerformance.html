@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scripted Performance™ — Multi-Role Reader · Devilish Labs</title>
+    <style>
+        /* ═══════════════════════════════════════════════════════
+           DESIGN SYSTEM — Dark + Neon Cyan + Liquid Glass
+           ═══════════════════════════════════════════════════════ */
+        :root {
+            --bg-deep:      #050810;
+            --bg-mid:       #090d1a;
+            --bg-surface:   #0d1220;
+            --neon:         #00ffe7;
+            --neon-dim:     rgba(0,255,231,0.18);
+            --neon-glow:    rgba(0,255,231,0.35);
+            --neon-soft:    rgba(0,255,231,0.08);
+            --accent:       #7c3aed;
+            --accent-dim:   rgba(124,58,237,0.2);
+            --pink:         #ff2d78;
+            --pink-dim:     rgba(255,45,120,0.15);
+            --purple:       #a78bfa;
+            --green:        #22c55e;
+            --text-primary: #e8f4f8;
+            --text-muted:   #6b8499;
+            --text-dim:     #3a4f60;
+            --glass-bg:     rgba(13,18,32,0.65);
+            --glass-border: rgba(0,255,231,0.12);
+            --glass-blur:   blur(18px);
+            --radius-lg:    18px;
+            --radius-md:    12px;
+            --radius-sm:    8px;
+            --shadow-card:  0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: var(--bg-deep);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed; top: -20%; left: -10%;
+            width: 60vw; height: 60vw;
+            background: radial-gradient(circle, rgba(167,139,250,0.04) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed; bottom: 10%; right: -15%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(255,45,120,0.05) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 12px 14px; position: relative; z-index: 1; }
+
+        header { text-align: center; padding: 20px 0 14px; position: relative; }
+        .logo-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 4px; }
+        .hub-back {
+            position: absolute; top: 20px; left: 0;
+            display: flex; align-items: center; gap: 5px;
+            color: var(--text-muted); font-size: 0.75rem; font-weight: 600;
+            text-decoration: none; letter-spacing: 0.3px;
+            padding: 5px 10px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            transition: all 0.2s;
+        }
+        .hub-back:hover { color: var(--neon); border-color: var(--neon-dim); background: var(--neon-soft); }
+        .logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 0 16px rgba(167,139,250,0.4);
+        }
+        h1 {
+            font-size: 1.75rem; font-weight: 800;
+            background: linear-gradient(90deg, var(--purple) 0%, var(--pink) 60%, var(--neon) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        .subtitle { color: var(--text-muted); font-size: 0.8rem; letter-spacing: 0.3px; }
+        .version-badge {
+            display: inline-block;
+            background: rgba(167,139,250,0.15); border: 1px solid var(--purple); color: var(--purple);
+            font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+            letter-spacing: 0.5px; margin-left: 6px; vertical-align: middle;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: var(--radius-lg);
+            padding: 18px; margin-bottom: 14px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-card);
+            position: relative; overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(167,139,250,0.3), transparent);
+        }
+        .card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; color: var(--purple); display: flex; align-items: center; gap: 8px; }
+
+        /* ── Forms ── */
+        .form-group { margin-bottom: 14px; }
+        label {
+            display: block; margin-bottom: 6px; color: var(--text-muted);
+            font-weight: 500; font-size: 0.8rem; letter-spacing: 0.3px; text-transform: uppercase;
+        }
+        input[type="text"], input[type="password"], textarea, select {
+            width: 100%; padding: 12px 14px;
+            background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius-sm); color: var(--text-primary);
+            font-size: 0.9rem; transition: border-color 0.3s, box-shadow 0.3s;
+            -webkit-appearance: none;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none; border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+        }
+        textarea { resize: vertical; }
+        select option { background: var(--bg-mid); color: var(--text-primary); }
+
+        /* ── Buttons ── */
+        .btn {
+            padding: 13px 22px; border: none; border-radius: var(--radius-sm);
+            font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.25s;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 6px; letter-spacing: 0.2px;
+        }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--purple) 0%, var(--pink) 100%);
+            color: #fff; width: 100%; box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(124,58,237,0.45); }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.06); color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+
+        .btn-neon {
+            background: transparent; color: var(--neon); border: 1px solid var(--neon);
+            box-shadow: 0 0 12px var(--neon-dim), inset 0 0 12px var(--neon-soft);
+        }
+        .btn-neon:hover:not(:disabled) { background: var(--neon-soft); }
+
+        .btn-purple {
+            background: var(--accent-dim); color: var(--purple); border: 1px solid rgba(124,58,237,0.4);
+        }
+        .btn-purple:hover:not(:disabled) { background: rgba(124,58,237,0.3); }
+
+        .btn-danger { background: var(--pink-dim); color: var(--pink); border: 1px solid rgba(255,45,120,0.3); }
+        .btn-small { padding: 7px 14px; font-size: 0.75rem; }
+        .btn-group { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .btn-group .btn { flex: 1; min-width: 0; }
+
+        /* ── Messages ── */
+        .message {
+            padding: 12px 14px; border-radius: var(--radius-sm); margin-bottom: 12px;
+            display: none; font-size: 0.82rem; font-weight: 500;
+        }
+        .message.visible { display: block; }
+        .message.success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; }
+        .message.error   { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
+        .message.info    { background: var(--neon-soft); border: 1px solid rgba(0,255,231,0.2); color: var(--neon); }
+        .message.warning { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); color: #fbbf24; }
+
+        /* ── Tab Bar ── */
+        .tab-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(5,8,16,0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(167,139,250,0.15);
+            display: flex; justify-content: space-around;
+            padding: 8px 0 env(safe-area-inset-bottom, 8px) 0; z-index: 100;
+        }
+        .tab-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            background: none; border: none; color: var(--text-dim);
+            font-size: 0.6rem; font-weight: 600; letter-spacing: 0.3px;
+            cursor: pointer; padding: 6px 8px; border-radius: var(--radius-sm);
+            transition: all 0.25s; min-width: 52px; text-transform: uppercase;
+        }
+        .tab-btn .tab-icon { font-size: 1.2rem; }
+        .tab-btn.active { color: var(--purple); background: var(--accent-dim); }
+        .tab-btn.active .tab-icon { filter: drop-shadow(0 0 6px var(--purple)); }
+
+        /* ── Pages ── */
+        .page { display: none; animation: fadeUp 0.25s ease; }
+        .page.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── Script Editor ── */
+        .script-editor {
+            width: 100%; min-height: 220px; padding: 14px;
+            background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius-sm); color: var(--text-primary);
+            font-size: 0.88rem; line-height: 1.8; resize: vertical;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            transition: border-color 0.3s;
+        }
+        .script-editor:focus { outline: none; border-color: var(--purple); }
+
+        .syntax-hint {
+            background: rgba(124,58,237,0.06); border: 1px solid rgba(124,58,237,0.15);
+            border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 14px;
+            font-size: 0.78rem; line-height: 1.7; color: var(--text-muted);
+        }
+        .syntax-hint code { color: var(--neon); background: rgba(0,255,231,0.08); padding: 1px 5px; border-radius: 3px; font-family: monospace; }
+
+        /* ── Role Bindings ── */
+        .role-binding {
+            display: flex; gap: 8px; align-items: center;
+            background: rgba(0,0,0,0.2); border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.06); padding: 10px 12px;
+            margin-bottom: 8px;
+        }
+        .role-name {
+            flex: 0 0 auto; min-width: 80px; max-width: 120px;
+            font-size: 0.82rem; font-weight: 700; color: var(--text-primary);
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .role-color-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+        }
+        .role-binding select { flex: 1; padding: 8px 10px; font-size: 0.8rem; }
+        .role-binding .del-btn {
+            background: none; border: none; color: var(--text-dim); cursor: pointer;
+            font-size: 1.1rem; padding: 4px; flex-shrink: 0; transition: color 0.2s;
+        }
+        .role-binding .del-btn:hover { color: var(--pink); }
+
+        /* ── Script Lines (playback view) ── */
+        .script-lines { max-height: 320px; overflow-y: auto; }
+        .script-line {
+            display: flex; gap: 10px; padding: 8px 10px; border-radius: var(--radius-sm);
+            margin-bottom: 4px; transition: background 0.2s; cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .script-line:hover { background: rgba(255,255,255,0.04); }
+        .script-line.playing {
+            background: rgba(124,58,237,0.12); border-color: rgba(124,58,237,0.3);
+            animation: lineGlow 1.5s ease-in-out infinite;
+        }
+        @keyframes lineGlow { 0%,100% { box-shadow: 0 0 0 rgba(124,58,237,0); } 50% { box-shadow: 0 0 12px rgba(124,58,237,0.3); } }
+        .script-line.done { opacity: 0.45; }
+        .line-speaker {
+            font-size: 0.72rem; font-weight: 700; flex-shrink: 0; width: 70px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            padding-top: 2px;
+        }
+        .line-text { font-size: 0.85rem; line-height: 1.6; color: var(--text-primary); flex: 1; }
+        .line-play-btn {
+            background: none; border: none; color: var(--text-dim); cursor: pointer;
+            font-size: 1rem; flex-shrink: 0; padding: 2px 4px; transition: color 0.2s;
+        }
+        .line-play-btn:hover { color: var(--purple); }
+
+        /* ── BGM Panel ── */
+        .bgm-panel {
+            background: rgba(0,0,0,0.2); border-radius: var(--radius-md);
+            border: 1px solid rgba(255,255,255,0.06); padding: 14px; margin-bottom: 14px;
+        }
+        .bgm-panel h4 { font-size: 0.85rem; font-weight: 700; color: var(--purple); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+        .bgm-toggle { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .toggle-switch {
+            position: relative; width: 44px; height: 24px; flex-shrink: 0;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; cursor: pointer; inset: 0;
+            background: rgba(255,255,255,0.1); border-radius: 24px; transition: 0.3s;
+        }
+        .toggle-slider::before {
+            content: ''; position: absolute; height: 18px; width: 18px;
+            left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.3s;
+        }
+        input:checked + .toggle-slider { background: var(--purple); }
+        input:checked + .toggle-slider::before { transform: translateX(20px); }
+        .toggle-label { font-size: 0.85rem; color: var(--text-primary); font-weight: 600; }
+
+        .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .slider-row label { font-size: 0.75rem; color: var(--text-muted); width: 80px; flex-shrink: 0; text-transform: none; margin: 0; }
+        .slider-row input[type="range"] { flex: 1; accent-color: var(--purple); }
+        .slider-val { font-size: 0.72rem; color: var(--purple); width: 36px; text-align: right; flex-shrink: 0; }
+
+        .play-mode-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+        .play-mode-btn {
+            padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2); color: var(--text-muted); font-size: 0.72rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .play-mode-btn.active { background: var(--accent-dim); color: var(--purple); border-color: rgba(124,58,237,0.4); }
+
+        .bgm-track-list { margin-top: 10px; }
+        .bgm-track {
+            display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+            background: rgba(0,0,0,0.2); border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.05); margin-bottom: 6px;
+        }
+        .bgm-track-name { flex: 1; font-size: 0.8rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bgm-track-del { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1rem; transition: color 0.2s; }
+        .bgm-track-del:hover { color: var(--pink); }
+        .bgm-active-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); flex-shrink: 0; }
+        .bgm-active-indicator.inactive { background: var(--text-dim); box-shadow: none; }
+
+        /* ── Playback Controls ── */
+        .playback-controls {
+            display: flex; gap: 10px; align-items: center; justify-content: center;
+            padding: 16px; background: rgba(0,0,0,0.3); border-radius: var(--radius-md);
+            border: 1px solid rgba(124,58,237,0.2); margin-top: 14px;
+        }
+        .ctrl-btn {
+            width: 44px; height: 44px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; cursor: pointer; transition: all 0.2s;
+        }
+        .ctrl-play {
+            width: 56px; height: 56px; font-size: 1.4rem;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            color: #fff; box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+        }
+        .ctrl-play:hover { transform: scale(1.08); }
+        .ctrl-secondary { background: rgba(255,255,255,0.08); color: var(--text-muted); }
+        .ctrl-secondary:hover { background: rgba(255,255,255,0.14); color: var(--text-primary); }
+
+        .playback-status {
+            text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 8px;
+            min-height: 20px;
+        }
+
+        /* ── Progress ── */
+        .progress-bar-wrap {
+            background: rgba(255,255,255,0.06); border-radius: 20px; height: 4px;
+            overflow: hidden; margin: 8px 0;
+        }
+        .progress-bar-fill {
+            height: 100%; border-radius: 20px;
+            background: linear-gradient(90deg, var(--purple), var(--pink));
+            transition: width 0.3s ease; width: 0%;
+        }
+
+        /* ── Loading ── */
+        .loading {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.2); border-radius: 50%;
+            border-top-color: #fff; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state { text-align: center; color: var(--text-dim); padding: 36px 0; font-size: 0.88rem; }
+        .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.4; }
+
+        .small-note { color: var(--text-dim); font-size: 0.72rem; margin-top: 4px; line-height: 1.4; }
+        a { color: var(--neon); text-decoration: none; }
+
+        /* ── Role color palette ── */
+        .role-colors { --c0:#00ffe7; --c1:#a78bfa; --c2:#ff2d78; --c3:#f59e0b; --c4:#22c55e; --c5:#38bdf8; --c6:#fb923c; --c7:#e879f9; }
+
+        /* ── Settings ── */
+        .settings-section { margin-bottom: 20px; }
+        .settings-section h3 {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--purple); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+        }
+        .settings-section h3::after { content: ''; flex: 1; height: 1px; background: rgba(124,58,237,0.15); }
+
+        @media (min-width: 600px) { .container { max-width: 540px; } h1 { font-size: 2rem; } }
+    </style>
+</head>
+<body>
+
+<div class="container role-colors">
+    <header>
+        <a href="index.html" class="hub-back">← Hub</a>
+        <div class="logo-row">
+            <div class="logo-icon">🎭</div>
+            <h1>Scripted Performance™<span class="version-badge">v1.0</span></h1>
+        </div>
+        <p class="subtitle">Multi-Role Audio Reader · Devilish Labs</p>
+    </header>
+
+    <div class="message" id="global-message"></div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE: SCRIPT
+    ═══════════════════════════════════════════ -->
+    <div id="script-page" class="page active">
+
+        <div class="syntax-hint">
+            <strong style="color:var(--purple)">Script Format:</strong><br>
+            <code>&lt;&lt;Character Name&gt;&gt;Their dialogue here.</code> — character line<br>
+            Lines <em>without</em> tags = Narrator (uses narrator voice)<br>
+            <code>[sound: description]</code> — stage directions (skipped in TTS)<br>
+            Example: <code>&lt;&lt;Alice&gt;&gt;The wind feels cold today.</code>
+        </div>
+
+        <div class="card">
+            <h2>📝 Script Editor</h2>
+            <div class="form-group">
+                <label>Paste or write your script</label>
+                <textarea class="script-editor" id="script-input" rows="12" placeholder="Rain tapped on the steel roof, and the wind carried a faint metallic hum.
+<<Alice>>The wind feels cold today.
+A distant thunder rolled, and hurried footsteps echoed through the corridor.
+<<Bob>>We need to move. Now.
+<<Alice>>I know. But where do we go?"></textarea>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary btn-small" onclick="loadSampleScript()">📖 Load Sample</button>
+                <button class="btn btn-secondary btn-small" onclick="clearScript()">🗑 Clear</button>
+                <button class="btn btn-purple btn-small" onclick="parseAndShowRoles()">🔍 Parse Roles →</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE: ROLES
+    ═══════════════════════════════════════════ -->
+    <div id="roles-page" class="page">
+
+        <div class="card">
+            <h2>🎭 Role Bindings</h2>
+            <p style="color:var(--text-muted);font-size:0.8rem;margin-bottom:14px;">Assign a Fish Audio voice to each character. Bindings are saved and remembered.</p>
+
+            <!-- Voice search + status -->
+            <input type="text" id="voice-search" placeholder="🔍 Search voices by name…" oninput="onVoiceSearch()">
+            <div id="voice-status" class="small-note" style="margin:6px 0 12px"></div>
+
+            <!-- Narrator -->
+            <div style="margin-bottom:12px">
+                <label>Narrator Voice</label>
+                <select id="narrator-voice">
+                    <option value="">— Select narrator voice —</option>
+                </select>
+                <p class="small-note">Used for lines without character tags</p>
+            </div>
+
+            <div class="neon-divider" style="height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.2),transparent);margin:14px 0"></div>
+
+            <div id="role-bindings-list">
+                <div class="empty-state"><div class="empty-icon">🎭</div><p>Parse a script first to see roles.</p></div>
+            </div>
+
+            <button class="btn btn-primary" style="margin-top:14px" onclick="saveBindingsAndPreview()">💾 Save & Go to Perform →</button>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE: PERFORM
+    ═══════════════════════════════════════════ -->
+    <div id="perform-page" class="page">
+
+        <!-- BGM Panel -->
+        <div class="bgm-panel">
+            <h4>🎵 Background Music</h4>
+            <div class="bgm-toggle">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="bgm-enabled" onchange="toggleBGM()">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Enable BGM</span>
+            </div>
+
+            <div id="bgm-controls" style="display:none">
+                <div class="slider-row">
+                    <label>Volume</label>
+                    <input type="range" id="bgm-volume" min="0" max="100" value="18" oninput="updateBGMVolume()">
+                    <span class="slider-val" id="bgm-vol-label">18%</span>
+                </div>
+                <div class="slider-row">
+                    <label>Fade In</label>
+                    <input type="range" id="bgm-fade-in" min="0" max="3000" step="100" value="800" oninput="updateFadeLabel('in')">
+                    <span class="slider-val" id="bgm-fadein-label">0.8s</span>
+                </div>
+                <div class="slider-row">
+                    <label>Fade Out</label>
+                    <input type="range" id="bgm-fade-out" min="0" max="3000" step="100" value="1000" oninput="updateFadeLabel('out')">
+                    <span class="slider-val" id="bgm-fadeout-label">1.0s</span>
+                </div>
+
+                <div class="form-group" style="margin-bottom:8px">
+                    <label>Play Mode</label>
+                    <div class="play-mode-row">
+                        <button class="play-mode-btn active" onclick="setBGMMode('random')" id="bgmmode-random">🔀 Random</button>
+                        <button class="play-mode-btn" onclick="setBGMMode('sequential')" id="bgmmode-sequential">▶ Sequential</button>
+                        <button class="play-mode-btn" onclick="setBGMMode('loop')" id="bgmmode-loop">🔁 Loop</button>
+                    </div>
+                </div>
+
+                <div class="bgm-track-list" id="bgm-track-list">
+                    <div style="color:var(--text-dim);font-size:0.78rem;text-align:center;padding:10px 0">No BGM tracks. Import below.</div>
+                </div>
+                <button class="btn btn-secondary btn-small" style="width:100%;margin-top:8px" onclick="document.getElementById('bgm-import').click()">
+                    + Import BGM Track
+                </button>
+                <input type="file" id="bgm-import" accept="audio/*" style="display:none" onchange="importBGMTrack(this)" multiple>
+            </div>
+        </div>
+
+        <!-- Script Lines -->
+        <div class="card">
+            <h2>🎬 Performance</h2>
+
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="perf-progress"></div>
+            </div>
+            <p class="playback-status" id="playback-status">Ready to perform</p>
+
+            <div class="script-lines" id="script-lines-view">
+                <div class="empty-state"><div class="empty-icon">🎭</div><p>Set up your script and roles first.</p></div>
+            </div>
+
+            <div class="playback-controls">
+                <button class="ctrl-btn ctrl-secondary" onclick="skipBack()" title="Previous line">⏮</button>
+                <button class="ctrl-btn ctrl-play" id="play-pause-btn" onclick="togglePlayback()">▶</button>
+                <button class="ctrl-btn ctrl-secondary" onclick="skipForward()" title="Next line">⏭</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE: SETTINGS
+    ═══════════════════════════════════════════ -->
+    <div id="settings-page" class="page">
+        <div class="card">
+            <h2>⚙️ API Keys</h2>
+            <p style="color:var(--text-muted);font-size:0.8rem;margin-bottom:16px;">Shared with all Devilish Labs apps.</p>
+
+            <div class="settings-section">
+                <h3>🐟 Fish Audio</h3>
+                <div class="form-group">
+                    <label>API Key</label>
+                    <div style="display:flex;gap:8px">
+                        <input type="password" id="fish-api-key" placeholder="fish_xxxxxxxxxxxxxxxx…" style="flex:1">
+                        <button class="btn btn-neon btn-small" onclick="saveKeys()">Save</button>
+                    </div>
+                    <p class="small-note">Get yours at <a href="https://fish.audio" target="_blank">fish.audio</a></p>
+                </div>
+                <div class="form-group">
+                    <label>Proxy Server (optional)</label>
+                    <input type="text" id="server-base" placeholder="http://localhost:2345">
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="text-align:center;padding:20px;">
+            <p style="color:var(--text-dim);font-size:0.75rem;letter-spacing:0.5px;text-transform:uppercase;">Devilish Labs · Scripted Performance v1.0</p>
+            <p style="color:var(--text-dim);font-size:0.7rem;margin-top:4px;">Part of the Audio Suite</p>
+        </div>
+    </div>
+
+</div><!-- /container -->
+
+<!-- ── Bottom Tab Bar ── -->
+<div class="tab-bar">
+    <button class="tab-btn active" onclick="showPage('script')" id="tab-script">
+        <span class="tab-icon">📝</span>Script
+    </button>
+    <button class="tab-btn" onclick="showPage('roles')" id="tab-roles">
+        <span class="tab-icon">🎭</span>Roles
+    </button>
+    <button class="tab-btn" onclick="showPage('perform')" id="tab-perform">
+        <span class="tab-icon">🎬</span>Perform
+    </button>
+    <button class="tab-btn" onclick="showPage('settings')" id="tab-settings">
+        <span class="tab-icon">⚙️</span>Settings
+    </button>
+</div>
+
+<!-- Hidden BGM audio element -->
+<audio id="bgm-player" loop></audio>
+
+<script src="voiceService.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  Scripted Performance™ v1.0 — Devilish Labs Audio Suite
+//  Shared localStorage namespace: devilish_*
+// ═══════════════════════════════════════════════════════════════
+
+// ─── Shared Key Namespace ────────────────────────────────────────
+const DL = {
+    get fishKey()    { return localStorage.getItem('devilish_fish_key') || ''; },
+    get serverBase() { return (localStorage.getItem('devilish_server_base') || '').replace(/\/+$/, ''); },
+    set fishKey(v)    { localStorage.setItem('devilish_fish_key', v); },
+    set serverBase(v) { localStorage.setItem('devilish_server_base', v); },
+};
+
+// ─── State ──────────────────────────────────────────────────────
+let parsedLines      = [];   // { type: 'narrator'|'character', speaker: string, text: string }
+let roleBindings     = {};   // { characterName: voiceId }
+let narratorVoiceId  = '';
+let myVoices         = [];
+let voicesReady      = Promise.resolve({ community: [], myVoices: [] });
+let bgmTracks        = [];   // { name, dataUrl }
+let bgmMode          = 'random';
+let bgmEnabled       = false;
+let bgmFadeIn        = 800;
+let bgmFadeOut       = 1000;
+let bgmVolume        = 0.18;
+let bgmCurrentIdx    = 0;
+
+// Playback state
+let isPlaying        = false;
+let currentLineIdx   = 0;
+let playbackAbort    = false;
+let currentAudio     = null;
+
+// Role color palette
+const ROLE_COLORS = ['#00ffe7','#a78bfa','#ff2d78','#f59e0b','#22c55e','#38bdf8','#fb923c','#e879f9'];
+
+// ─── Init ────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('fish-api-key').value = DL.fishKey;
+    document.getElementById('server-base').value  = DL.serverBase;
+
+    // Load voices from shared DigiVoX Voice Service (live + cached fallback)
+    loadVoices();
+
+    // Load saved role bindings
+    const savedBindings = localStorage.getItem('sp_role_bindings');
+    if (savedBindings) roleBindings = JSON.parse(savedBindings);
+
+    const savedNarrator = localStorage.getItem('sp_narrator_voice');
+    if (savedNarrator) narratorVoiceId = savedNarrator;
+
+    // Load BGM tracks
+    const savedBGM = localStorage.getItem('sp_bgm_tracks');
+    if (savedBGM) bgmTracks = JSON.parse(savedBGM);
+
+    // Load saved script
+    const savedScript = localStorage.getItem('sp_script');
+    if (savedScript) document.getElementById('script-input').value = savedScript;
+
+    renderBGMTrackList();
+});
+
+// ─── UI ──────────────────────────────────────────────────────────
+function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    document.getElementById(page + '-page').classList.add('active');
+    document.getElementById('tab-' + page).classList.add('active');
+    if (page === 'roles') populateRolesPage();
+    if (page === 'perform') buildPerformView();
+}
+
+function showMessage(text, type) {
+    const m = document.getElementById('global-message');
+    m.textContent = text;
+    m.className = 'message visible ' + type;
+    clearTimeout(m._timer);
+    m._timer = setTimeout(() => { m.className = 'message'; }, 5000);
+}
+
+function setButtonLoading(btnId, loading, label) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    if (loading) {
+        btn.disabled = true;
+        btn.dataset.original = btn.innerHTML;
+        btn.innerHTML = `<span class="loading"></span> ${label || 'Processing…'}`;
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.original || 'Submit';
+    }
+}
+
+// ─── Script Parsing ───────────────────────────────────────────────
+const CHAR_REGEX = /^<<([^>]+)>>\s*(.+)$/;
+const STAGE_REGEX = /^\[.+\]$/;
+
+function parseScript(text) {
+    const lines = text.split('\n');
+    const result = [];
+    for (const raw of lines) {
+        const line = raw.trim();
+        if (!line) continue;
+        if (STAGE_REGEX.test(line)) continue; // skip stage directions
+        const match = CHAR_REGEX.exec(line);
+        if (match) {
+            result.push({ type: 'character', speaker: match[1].trim(), text: match[2].trim() });
+        } else {
+            result.push({ type: 'narrator', speaker: 'Narrator', text: line });
+        }
+    }
+    return result;
+}
+
+function getUniqueCharacters(lines) {
+    const chars = new Set();
+    for (const l of lines) {
+        if (l.type === 'character') chars.add(l.speaker);
+    }
+    return [...chars];
+}
+
+function parseAndShowRoles() {
+    const text = document.getElementById('script-input').value.trim();
+    if (!text) return showMessage('Enter a script first', 'error');
+    try {
+        localStorage.setItem('sp_script', text);
+    } catch (e) {
+        // Persistence is best-effort — a full localStorage (e.g. saved podcast
+        // episodes with audio) must never block parsing.
+        console.warn('Could not save script to localStorage:', e);
+        showMessage('Script too big to save locally, but parsing works anyway', 'info');
+    }
+    parsedLines = parseScript(text);
+    if (!parsedLines.length) return showMessage('No readable lines found in script', 'error');
+    showMessage(`Parsed ${parsedLines.length} lines. Assign voices to roles.`, 'success');
+    showPage('roles');
+}
+
+function clearScript() {
+    document.getElementById('script-input').value = '';
+    localStorage.removeItem('sp_script');
+    parsedLines = [];
+}
+
+function loadSampleScript() {
+    document.getElementById('script-input').value = `Rain tapped on the steel roof, and the wind carried a faint metallic hum.
+<<Elena>>The wind feels cold today. Something's wrong.
+A distant thunder rolled, and hurried footsteps echoed through the corridor.
+<<Marcus>>We need to move. Now. They've found the signal.
+<<Elena>>I know. But where do we go? Every route is compromised.
+Marcus paused, his eyes scanning the flickering monitors.
+<<Marcus>>There's one way. The old tunnels under the east district. Nobody's used them in years.
+<<Elena>>For good reason. Half of them are flooded.
+<<Marcus>>Half of them. Not all.
+The lights flickered once, then died. In the darkness, only the soft glow of the monitors remained.`;
+    showMessage('Sample script loaded!', 'success');
+}
+
+// ─── Roles Page ───────────────────────────────────────────────────
+let masterVoices   = [];   // { id, name, mine } — full unfiltered list, rebuilt on every voice load
+let lastVoiceError = null;
+
+async function populateRolesPage() {
+    if (!parsedLines.length) {
+        const saved = localStorage.getItem('sp_script');
+        if (saved) { parsedLines = parseScript(saved); }
+    }
+
+    const chars = getUniqueCharacters(parsedLines);
+    const lists = await voicesReady;
+    lastVoiceError = (window.DigiVoX_VoiceService && DigiVoX_VoiceService.state.lastError) || null;
+
+    // Master list: clones first (starred), then community
+    const mineRaw = (lists.myVoices.length ? lists.myVoices : myVoices);
+    masterVoices = [
+        ...mineRaw.map(v => ({ id: v.id, name: '★ ' + v.name, mine: true })),
+        ...lists.community.map(v => ({ id: v.id, name: v.name, mine: false }))
+    ];
+
+    renderVoiceStatus(lists, mineRaw.length);
+    renderVoiceSelect(document.getElementById('narrator-voice'), narratorVoiceId, '— Select narrator voice —');
+
+    // Role bindings
+    const list = document.getElementById('role-bindings-list');
+    if (!chars.length) {
+        list.innerHTML = '<div class="empty-state"><div class="empty-icon">🎭</div><p>No character tags found. Use &lt;&lt;Name&gt;&gt; format.</p></div>';
+        return;
+    }
+
+    list.innerHTML = chars.map((char, i) => {
+        const color = ROLE_COLORS[i % ROLE_COLORS.length];
+        return `
+            <div class="role-binding" data-char="${escHtml(char)}">
+                <div class="role-color-dot" style="background:${color}"></div>
+                <div class="role-name" title="${escHtml(char)}" style="color:${color}">${escHtml(char)}</div>
+                <select class="role-voice-sel" data-char="${escHtml(char)}" onchange="updateBinding('${escHtml(char)}', this.value)"></select>
+            </div>
+        `;
+    }).join('');
+
+    list.querySelectorAll('select.role-voice-sel').forEach(sel => {
+        renderVoiceSelect(sel, roleBindings[sel.dataset.char] || '', '— Voice —');
+    });
+}
+
+// Rebuild one <select> from masterVoices, applying the search filter.
+// Selected voice is always kept (marked "(current)") even when filtered out.
+function renderVoiceSelect(sel, selectedId, placeholder) {
+    const searchEl = document.getElementById('voice-search');
+    const q = ((searchEl && searchEl.value) || '').trim().toLowerCase();
+    const filtered = q
+        ? masterVoices.filter(v => v.name.toLowerCase().includes(q) || v.id.toLowerCase().includes(q))
+        : masterVoices;
+
+    let current = null;
+    if (selectedId && !filtered.some(v => v.id === selectedId)) {
+        const found = masterVoices.find(v => v.id === selectedId);
+        if (found) current = { ...found, name: found.name + ' (current)' };
+    }
+
+    const mine = filtered.filter(v => v.mine);
+    const comm = filtered.filter(v => !v.mine);
+    let html = `<option value="">${escHtml(placeholder)}</option>`;
+    if (current) html += `<option value="${escHtml(current.id)}">${escHtml(current.name)}</option>`;
+    if (mine.length)  html += `<optgroup label="★ My Clones">${mine.map(o => `<option value="${escHtml(o.id)}">${escHtml(o.name)}</option>`).join('')}</optgroup>`;
+    if (comm.length)  html += `<optgroup label="🌐 Community">${comm.map(o => `<option value="${escHtml(o.id)}">${escHtml(o.name)}</option>`).join('')}</optgroup>`;
+    if (!mine.length && !comm.length && !current) html += `<option value="" disabled>No voices match "${escHtml(q)}"</option>`;
+    sel.innerHTML = html;
+    if (selectedId) sel.value = selectedId;
+}
+
+// Live search — re-render every voice select on the page
+function onVoiceSearch() {
+    const narratorSel = document.getElementById('narrator-voice');
+    if (narratorSel) renderVoiceSelect(narratorSel, narratorSel.value, '— Select narrator voice —');
+    document.querySelectorAll('#role-bindings-list select.role-voice-sel').forEach(sel => {
+        renderVoiceSelect(sel, sel.value, '— Voice —');
+    });
+}
+
+// Voice load status — exact error text is shown, never swallowed
+function renderVoiceStatus(lists, mineCount) {
+    const el = document.getElementById('voice-status');
+    if (!el) return;
+    if (lastVoiceError) {
+        el.innerHTML = `<span style="color:#ef4444">⚠ Voice library error: ${escHtml(lastVoiceError.message || String(lastVoiceError))}</span> · <a href="#" onclick="retryVoices();return false;">retry</a>`;
+    } else if (!DL.fishKey) {
+        el.innerHTML = '<span style="color:#fbbf24">No Fish API key set — add one in Settings to load your clones.</span>';
+    } else {
+        el.textContent = `★ ${mineCount} cloned · 🌐 ${lists.community.length} community voices`;
+    }
+}
+
+async function retryVoices() {
+    if (!DL.fishKey) { showMessage('Add your Fish Audio API key in Settings first', 'error'); return; }
+    const el = document.getElementById('voice-status');
+    if (el) el.textContent = 'Refreshing voices…';
+    voicesReady = DigiVoX_VoiceService.refreshAll().catch(err => {
+        lastVoiceError = err;
+        console.warn('ScriptedPerformance voice refresh failed:', err);
+        return { community: [], myVoices: [...myVoices] };
+    });
+    await voicesReady;
+    populateRolesPage();
+}
+
+function updateBinding(char, voiceId) {
+    roleBindings[char] = voiceId;
+}
+
+function saveBindingsAndPreview() {
+    narratorVoiceId = document.getElementById('narrator-voice').value;
+    localStorage.setItem('sp_narrator_voice', narratorVoiceId);
+    localStorage.setItem('sp_role_bindings', JSON.stringify(roleBindings));
+    showMessage('Bindings saved!', 'success');
+    showPage('perform');
+}
+
+async function loadVoices() {
+    const saved = localStorage.getItem('digivoice_voices');
+    if (saved) {
+        try { myVoices = JSON.parse(saved); } catch (e) { myVoices = []; }
+    }
+
+    if (!DL.fishKey) {
+        voicesReady = Promise.resolve({ community: [], myVoices: [...myVoices] });
+        return voicesReady;
+    }
+
+    voicesReady = DigiVoX_VoiceService.fetchAll().catch(err => {
+        console.warn('ScriptedPerformance voice fetch failed:', err);
+        return { community: [], myVoices: [...myVoices] };
+    });
+    return voicesReady;
+}
+
+// ─── Perform Page ─────────────────────────────────────────────────
+const chars_colors_cache = {};
+
+function buildPerformView() {
+    if (!parsedLines.length) {
+        const saved = localStorage.getItem('sp_script');
+        if (saved) parsedLines = parseScript(saved);
+    }
+    if (!parsedLines.length) {
+        document.getElementById('script-lines-view').innerHTML =
+            '<div class="empty-state"><div class="empty-icon">🎭</div><p>Set up your script first.</p></div>';
+        return;
+    }
+
+    const chars = getUniqueCharacters(parsedLines);
+    chars.forEach((c, i) => { chars_colors_cache[c] = ROLE_COLORS[i % ROLE_COLORS.length]; });
+
+    const container = document.getElementById('script-lines-view');
+    container.innerHTML = parsedLines.map((line, i) => {
+        const color = line.type === 'narrator' ? 'var(--text-muted)' : (chars_colors_cache[line.speaker] || 'var(--neon)');
+        return `
+            <div class="script-line" id="line-${i}" onclick="playSingleLine(${i})">
+                <div class="line-speaker" style="color:${color}">${escHtml(line.speaker)}</div>
+                <div class="line-text">${escHtml(line.text)}</div>
+                <button class="line-play-btn" title="Play this line">▶</button>
+            </div>
+        `;
+    }).join('');
+
+    updateProgress();
+}
+
+function updateProgress() {
+    const pct = parsedLines.length ? Math.round((currentLineIdx / parsedLines.length) * 100) : 0;
+    document.getElementById('perf-progress').style.width = pct + '%';
+    document.getElementById('playback-status').textContent =
+        parsedLines.length ? `Line ${currentLineIdx + 1} of ${parsedLines.length}` : 'Ready';
+}
+
+function highlightLine(idx) {
+    document.querySelectorAll('.script-line').forEach((el, i) => {
+        el.classList.remove('playing');
+        if (i < idx) el.classList.add('done');
+        else el.classList.remove('done');
+    });
+    const el = document.getElementById('line-' + idx);
+    if (el) {
+        el.classList.add('playing');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+// ─── TTS Synthesis ────────────────────────────────────────────────
+async function synthesizeLine(line) {
+    const voiceId = line.type === 'narrator'
+        ? narratorVoiceId
+        : (roleBindings[line.speaker] || narratorVoiceId);
+
+    if (!voiceId) throw new Error(`No voice assigned for "${line.speaker}". Go to Roles tab.`);
+    if (!DL.fishKey) throw new Error('Fish Audio API key required. Add it in Settings.');
+
+    const endpoint = DL.serverBase
+        ? `${DL.serverBase}/tts`
+        : ((location.protocol.startsWith('http') && String(location.port) === '2345')
+                ? '/tts'  // served by dl_proxy.js, same origin
+                : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+                    ? 'http://localhost:2345/tts'  // DigiVoX APK → Termux dl_proxy on-device
+                    : 'https://api.fish.audio/v1/tts'));
+
+    const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + DL.fishKey,
+            'Content-Type': 'application/json',
+            'Accept': 'audio/mpeg'
+        },
+        body: JSON.stringify({ text: line.text, reference_id: voiceId, format: 'mp3', normalize: true })
+    });
+
+    if (!res.ok) throw new Error(`TTS failed for "${line.speaker}": ` + await res.text());
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+}
+
+async function playLine(idx) {
+    if (idx >= parsedLines.length) return false;
+    const line = parsedLines[idx];
+    highlightLine(idx);
+    document.getElementById('playback-status').textContent = `Synthesizing: ${line.speaker}…`;
+
+    try {
+        const audioUrl = await synthesizeLine(line);
+        if (playbackAbort) return false;
+        document.getElementById('playback-status').textContent = `Playing: ${line.speaker}`;
+
+        return new Promise((resolve) => {
+            currentAudio = new Audio(audioUrl);
+            currentAudio.volume = 1.0;
+            currentAudio.onended = () => { URL.revokeObjectURL(audioUrl); resolve(true); };
+            currentAudio.onerror = () => { resolve(false); };
+            currentAudio.play().catch(() => resolve(false));
+        });
+    } catch (e) {
+        showMessage(e.message, 'error');
+        return false;
+    }
+}
+
+// ─── Playback Controls ────────────────────────────────────────────
+async function togglePlayback() {
+    if (isPlaying) {
+        pausePlayback();
+    } else {
+        startPlayback();
+    }
+}
+
+async function startPlayback() {
+    if (!parsedLines.length) return showMessage('Set up your script first', 'error');
+    if (!DL.fishKey) return showMessage('Add your Fish Audio API key in Settings', 'error');
+
+    isPlaying = true;
+    playbackAbort = false;
+    document.getElementById('play-pause-btn').textContent = '⏸';
+
+    if (bgmEnabled && bgmTracks.length) startBGM();
+
+    for (let i = currentLineIdx; i < parsedLines.length; i++) {
+        if (playbackAbort) break;
+        currentLineIdx = i;
+        updateProgress();
+        const ok = await playLine(i);
+        if (!ok || playbackAbort) break;
+    }
+
+    if (!playbackAbort) {
+        // Finished
+        currentLineIdx = 0;
+        document.querySelectorAll('.script-line').forEach(el => el.classList.remove('playing', 'done'));
+        document.getElementById('playback-status').textContent = '✅ Performance complete!';
+        updateProgress();
+        if (bgmEnabled) fadeOutBGM();
+    }
+
+    isPlaying = false;
+    document.getElementById('play-pause-btn').textContent = '▶';
+}
+
+function pausePlayback() {
+    playbackAbort = true;
+    isPlaying = false;
+    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+    document.getElementById('play-pause-btn').textContent = '▶';
+    document.getElementById('playback-status').textContent = `Paused at line ${currentLineIdx + 1}`;
+    if (bgmEnabled) fadeOutBGM();
+}
+
+function skipBack() {
+    if (isPlaying) pausePlayback();
+    currentLineIdx = Math.max(0, currentLineIdx - 1);
+    updateProgress();
+    highlightLine(currentLineIdx);
+}
+
+function skipForward() {
+    if (isPlaying) pausePlayback();
+    currentLineIdx = Math.min(parsedLines.length - 1, currentLineIdx + 1);
+    updateProgress();
+    highlightLine(currentLineIdx);
+}
+
+async function playSingleLine(idx) {
+    if (isPlaying) pausePlayback();
+    currentLineIdx = idx;
+    updateProgress();
+    isPlaying = true;
+    playbackAbort = false;
+    document.getElementById('play-pause-btn').textContent = '⏸';
+    await playLine(idx);
+    isPlaying = false;
+    playbackAbort = false;
+    document.getElementById('play-pause-btn').textContent = '▶';
+    currentLineIdx = idx + 1;
+    updateProgress();
+}
+
+// ─── BGM Engine ───────────────────────────────────────────────────
+const bgmPlayer = document.getElementById('bgm-player');
+
+function toggleBGM() {
+    bgmEnabled = document.getElementById('bgm-enabled').checked;
+    document.getElementById('bgm-controls').style.display = bgmEnabled ? 'block' : 'none';
+    if (!bgmEnabled && bgmPlayer.src) { fadeOutBGM(); }
+}
+
+function updateBGMVolume() {
+    bgmVolume = document.getElementById('bgm-volume').value / 100;
+    document.getElementById('bgm-vol-label').textContent = document.getElementById('bgm-volume').value + '%';
+    bgmPlayer.volume = bgmVolume;
+}
+
+function updateFadeLabel(dir) {
+    if (dir === 'in') {
+        bgmFadeIn = parseInt(document.getElementById('bgm-fade-in').value);
+        document.getElementById('bgm-fadein-label').textContent = (bgmFadeIn / 1000).toFixed(1) + 's';
+    } else {
+        bgmFadeOut = parseInt(document.getElementById('bgm-fade-out').value);
+        document.getElementById('bgm-fadeout-label').textContent = (bgmFadeOut / 1000).toFixed(1) + 's';
+    }
+}
+
+function setBGMMode(mode) {
+    bgmMode = mode;
+    document.querySelectorAll('.play-mode-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('bgmmode-' + mode).classList.add('active');
+    bgmPlayer.loop = (mode === 'loop');
+}
+
+function startBGM() {
+    if (!bgmTracks.length) return;
+    let idx;
+    if (bgmMode === 'random') idx = Math.floor(Math.random() * bgmTracks.length);
+    else idx = bgmCurrentIdx % bgmTracks.length;
+    bgmCurrentIdx = idx;
+
+    bgmPlayer.src = bgmTracks[idx].dataUrl;
+    bgmPlayer.volume = 0;
+    bgmPlayer.loop = (bgmMode === 'loop');
+    bgmPlayer.play().catch(() => {});
+
+    // Fade in
+    const steps = 20;
+    const stepTime = bgmFadeIn / steps;
+    const targetVol = bgmVolume;
+    let step = 0;
+    const fadeTimer = setInterval(() => {
+        step++;
+        bgmPlayer.volume = Math.min(targetVol, (step / steps) * targetVol);
+        if (step >= steps) clearInterval(fadeTimer);
+    }, stepTime);
+
+    bgmPlayer.onended = () => {
+        if (bgmMode === 'sequential') {
+            bgmCurrentIdx = (bgmCurrentIdx + 1) % bgmTracks.length;
+            startBGM();
+        } else if (bgmMode === 'random') {
+            startBGM();
+        }
+    };
+}
+
+function fadeOutBGM() {
+    if (!bgmPlayer.src || bgmPlayer.paused) return;
+    const startVol = bgmPlayer.volume;
+    const steps = 20;
+    const stepTime = bgmFadeOut / steps;
+    let step = 0;
+    const fadeTimer = setInterval(() => {
+        step++;
+        bgmPlayer.volume = Math.max(0, startVol * (1 - step / steps));
+        if (step >= steps) { clearInterval(fadeTimer); bgmPlayer.pause(); bgmPlayer.volume = bgmVolume; }
+    }, stepTime);
+}
+
+function importBGMTrack(input) {
+    const files = Array.from(input.files);
+    let loaded = 0;
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            bgmTracks.push({ name: file.name, dataUrl: e.target.result });
+            loaded++;
+            if (loaded === files.length) {
+                localStorage.setItem('sp_bgm_tracks', JSON.stringify(bgmTracks));
+                renderBGMTrackList();
+                showMessage(`${files.length} track(s) imported!`, 'success');
+            }
+        };
+        reader.readAsDataURL(file);
+    });
+    input.value = '';
+}
+
+function renderBGMTrackList() {
+    const list = document.getElementById('bgm-track-list');
+    if (!bgmTracks.length) {
+        list.innerHTML = '<div style="color:var(--text-dim);font-size:0.78rem;text-align:center;padding:10px 0">No BGM tracks. Import below.</div>';
+        return;
+    }
+    list.innerHTML = bgmTracks.map((t, i) => `
+        <div class="bgm-track">
+            <div class="bgm-active-indicator ${bgmCurrentIdx === i && bgmEnabled ? '' : 'inactive'}"></div>
+            <div class="bgm-track-name" title="${escHtml(t.name)}">${escHtml(t.name)}</div>
+            <button class="bgm-track-del" onclick="deleteBGMTrack(${i})" title="Remove">✕</button>
+        </div>
+    `).join('');
+}
+
+function deleteBGMTrack(i) {
+    bgmTracks.splice(i, 1);
+    localStorage.setItem('sp_bgm_tracks', JSON.stringify(bgmTracks));
+    renderBGMTrackList();
+}
+
+// ─── Settings ─────────────────────────────────────────────────────
+async function saveKeys() {
+    DL.fishKey   = document.getElementById('fish-api-key').value.trim();
+    DL.serverBase = document.getElementById('server-base').value.trim();
+    showMessage('Keys saved! Shared across all Devilish Labs apps.', 'success');
+    if (DL.fishKey) {
+        await DigiVoX_VoiceService.refreshAll();
+        await loadVoices();
+        if (document.getElementById('roles-page').classList.contains('active')) {
+            populateRolesPage();
+        }
+    }
+}
+
+// ─── Utility ──────────────────────────────────────────────────────
+function escHtml(t) {
+    const d = document.createElement('div');
+    d.textContent = t || '';
+    return d.innerHTML;
+}
+</script>
+<!-- Eruda mobile debugger -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+</body>
+</html>
