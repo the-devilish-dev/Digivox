@@ -176,9 +176,10 @@
          * Returns: { community: [...], myVoices: [...] }
          */
         async fetchAll(options = {}) {
+            state.lastError = null;
             const [community, myVoices] = await Promise.all([
-                this.fetchCommunity(options).catch(err => { console.warn('Community voices fetch failed:', err); return []; }),
-                this.fetchMyVoices(options).catch(err => { console.warn('My voices fetch failed:', err); return []; }),
+                this.fetchCommunity(options).catch(err => { console.warn('Community voices fetch failed:', err); state.lastError = err; return []; }),
+                this.fetchMyVoices(options).catch(err => { console.warn('My voices fetch failed:', err); state.lastError = err; return []; }),
             ]);
             return { community, myVoices };
         },
@@ -283,7 +284,7 @@
          * Direct access to current in-memory lists.
          */
         get state() {
-            return { community: [...state.community], myVoices: [...state.myVoices] };
+            return { community: [...state.community], myVoices: [...state.myVoices], lastError: state.lastError };
         },
 
         /**
